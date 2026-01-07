@@ -262,7 +262,7 @@ function createSubjectButtons() {
         
         if (isCore) {
             button.classList.add('core');
-            button.title = '核心科目（不可取消）';
+            button.title = '核心科目（不可取消） Core Subject (Cannot be deselected)';
         }
         
         button.addEventListener('click', () => {
@@ -450,9 +450,11 @@ function init() {
     createHeroCountdown();
     updateCountdownDisplay();
     
-    // Update countdowns every second
-    setInterval(updateCountdowns, 1000);
-    setInterval(updateHeroCountdown, 1000);
+    // Update all countdowns every second (combined for efficiency)
+    setInterval(() => {
+        updateCountdowns();
+        updateHeroCountdown();
+    }, 1000);
     
     // Rotate encouragement message every 10 seconds
     setInterval(rotateEncouragement, 10000);
