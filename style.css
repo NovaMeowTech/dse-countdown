@@ -672,15 +672,6 @@ body {
     }
 }
 
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .title {
