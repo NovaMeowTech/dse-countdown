@@ -1,105 +1,197 @@
-// DSE 2026 exam schedule (based on typical DSE schedule pattern)
-// TODO: IMPORTANT - Update these dates when the official 2026 DSE schedule is released by HKEAA
+// DSE 2026 exam schedule (Official timetable revised on 31 October 2025)
 const dseExams = {
+    'visual_arts': {
+        name: 'Visual Arts 視覺藝術',
+        englishName: 'Visual Arts',
+        papers: [
+            { paper: '卷一及卷二', date: new Date('2026-04-08T08:30:00') }
+        ]
+    },
     'chinese': {
         name: '中國語文',
+        englishName: 'Chinese Language',
+        isCore: true,
         papers: [
-            { paper: '卷一 (閱讀)', date: new Date('2026-03-30T08:30:00') },
-            { paper: '卷二 (寫作)', date: new Date('2026-03-30T13:00:00') },
-            { paper: '卷三 (聆聽及綜合)', date: new Date('2026-03-31T08:30:00') },
-            { paper: '卷四 (口語)', date: new Date('2026-04-01T08:30:00') }
+            { paper: 'Chinese Language 1 中國語文（一）', date: new Date('2026-04-09T08:30:00') },
+            { paper: 'Chinese Language 2 中國語文（二）', date: new Date('2026-04-09T10:45:00') }
         ]
     },
     'english': {
-        name: 'English Language',
+        name: 'English Language 英國語文',
+        englishName: 'English Language',
+        isCore: true,
         papers: [
-            { paper: 'Paper 1 (Reading)', date: new Date('2026-04-02T08:30:00') },
-            { paper: 'Paper 2 (Writing)', date: new Date('2026-04-02T13:00:00') },
-            { paper: 'Paper 3 (Listening)', date: new Date('2026-04-03T08:30:00') },
-            { paper: 'Paper 4 (Speaking)', date: new Date('2026-04-04T08:30:00') }
+            { paper: 'English Language 1 英國語文（一）', date: new Date('2026-04-10T08:30:00') },
+            { paper: 'English Language 2 英國語文（二）', date: new Date('2026-04-10T11:00:00') },
+            { paper: 'English Language 3 (Listening) 英國語文（三）（聆聽及綜合能力考核）', date: new Date('2026-04-11T09:15:00') }
         ]
     },
     'maths': {
-        name: '數學 (必修部分)',
+        name: 'Mathematics 數學（必修部分）',
+        englishName: 'Mathematics',
+        isCore: true,
         papers: [
-            { paper: '卷一', date: new Date('2026-04-06T08:30:00') },
-            { paper: '卷二', date: new Date('2026-04-06T13:00:00') }
+            { paper: 'Mathematics Compulsory Part 1 數學必修部分（一）', date: new Date('2026-04-13T08:30:00') },
+            { paper: 'Mathematics Compulsory Part 2 數學必修部分（二）', date: new Date('2026-04-13T11:30:00') }
         ]
     },
-    'maths_extended': {
-        name: '數學 (延伸部分)',
+    'cs': {
+        name: 'Citizenship and Social Development 公民與社會發展',
+        englishName: 'Citizenship and Social Development',
+        isCore: true,
         papers: [
-            { paper: 'M1/M2', date: new Date('2026-04-07T14:30:00') }
+            { paper: 'Citizenship and Social Development 公民與社會發展', date: new Date('2026-04-14T08:30:00') }
         ]
     },
-    'liberal_studies': {
-        name: '通識教育',
+    'ethics': {
+        name: 'Ethics & Religious Studies 倫理與宗教',
+        englishName: 'Ethics & Religious Studies',
         papers: [
-            { paper: '卷一', date: new Date('2026-04-08T08:30:00') },
-            { paper: '卷二', date: new Date('2026-04-08T13:00:00') }
-        ]
-    },
-    'physics': {
-        name: '物理',
-        papers: [
-            { paper: '卷一', date: new Date('2026-04-09T08:30:00') },
-            { paper: '卷二', date: new Date('2026-04-09T14:00:00') }
+            { paper: '卷一', date: new Date('2026-04-15T08:30:00') },
+            { paper: '卷二', date: new Date('2026-04-15T11:00:00') }
         ]
     },
     'chemistry': {
-        name: '化學',
+        name: 'Chemistry 化學',
+        englishName: 'Chemistry',
         papers: [
-            { paper: '卷一', date: new Date('2026-04-10T08:30:00') },
-            { paper: '卷二', date: new Date('2026-04-10T14:00:00') }
+            { paper: 'Chemistry 1 化學（一）', date: new Date('2026-04-16T08:30:00') },
+            { paper: 'Chemistry 2 化學（二）', date: new Date('2026-04-16T11:45:00') }
+        ]
+    },
+    'design_tech': {
+        name: 'Design & Applied Technology 設計與應用科技',
+        englishName: 'Design & Applied Technology',
+        papers: [
+            { paper: '卷一', date: new Date('2026-04-17T08:30:00') },
+            { paper: '卷二', date: new Date('2026-04-17T11:15:00') }
+        ]
+    },
+    'literature': {
+        name: 'Literature in English 英語文學',
+        englishName: 'Literature in English',
+        papers: [
+            { paper: '卷一', date: new Date('2026-04-17T08:30:00') },
+            { paper: '卷二', date: new Date('2026-04-17T13:30:00') }
+        ]
+    },
+    'health': {
+        name: 'Health Management & Social Care 健康管理與社會關懷',
+        englishName: 'Health Management & Social Care',
+        papers: [
+            { paper: '卷一', date: new Date('2026-04-18T08:30:00') },
+            { paper: '卷二', date: new Date('2026-04-18T11:15:00') }
         ]
     },
     'biology': {
-        name: '生物',
+        name: 'Biology 生物',
+        englishName: 'Biology',
         papers: [
-            { paper: '卷一', date: new Date('2026-04-13T08:30:00') },
-            { paper: '卷二', date: new Date('2026-04-13T14:00:00') }
+            { paper: 'Biology 1 生物（一）', date: new Date('2026-04-20T08:30:00') },
+            { paper: 'Biology 2 生物（二）', date: new Date('2026-04-20T11:45:00') }
         ]
     },
-    'economics': {
-        name: '經濟',
+    'chinese_literature': {
+        name: 'Chinese Literature 中國文學',
+        englishName: 'Chinese Literature',
         papers: [
-            { paper: '卷一', date: new Date('2026-04-14T08:30:00') },
-            { paper: '卷二', date: new Date('2026-04-14T14:00:00') }
+            { paper: '卷一', date: new Date('2026-04-21T08:30:00') },
+            { paper: '卷二', date: new Date('2026-04-21T11:15:00') }
         ]
     },
-    'bafs': {
-        name: '企業、會計與財務概論',
+    'tech_living': {
+        name: 'Technology & Living 科技與生活',
+        englishName: 'Technology & Living',
         papers: [
-            { paper: '卷一', date: new Date('2026-04-15T08:30:00') },
-            { paper: '卷二', date: new Date('2026-04-15T14:00:00') }
+            { paper: '卷一', date: new Date('2026-04-21T08:30:00') },
+            { paper: '卷二', date: new Date('2026-04-21T10:45:00') }
+        ]
+    },
+    'physics': {
+        name: 'Physics 物理',
+        englishName: 'Physics',
+        papers: [
+            { paper: 'Physics 1 物理（一）', date: new Date('2026-04-22T08:30:00') },
+            { paper: 'Physics 2 物理（二）', date: new Date('2026-04-22T11:45:00') }
         ]
     },
     'geography': {
-        name: '地理',
+        name: 'Geography 地理',
+        englishName: 'Geography',
         papers: [
-            { paper: '卷一', date: new Date('2026-04-16T08:30:00') },
-            { paper: '卷二', date: new Date('2026-04-16T14:00:00') }
-        ]
-    },
-    'history': {
-        name: '歷史',
-        papers: [
-            { paper: '卷一', date: new Date('2026-04-17T08:30:00') },
-            { paper: '卷二', date: new Date('2026-04-17T14:00:00') }
-        ]
-    },
-    'chinese_history': {
-        name: '中國歷史',
-        papers: [
-            { paper: '卷一', date: new Date('2026-04-20T08:30:00') },
-            { paper: '卷二', date: new Date('2026-04-20T14:00:00') }
+            { paper: 'Geography 1 地理（一）', date: new Date('2026-04-23T08:30:00') },
+            { paper: 'Geography 2 地理（二）', date: new Date('2026-04-23T12:00:00') }
         ]
     },
     'ict': {
-        name: '資訊及通訊科技',
+        name: 'Information & Communication Technology 資訊及通訊科技',
+        englishName: 'ICT',
         papers: [
-            { paper: '卷一', date: new Date('2026-04-21T08:30:00') },
-            { paper: '卷二', date: new Date('2026-04-21T14:00:00') }
+            { paper: 'ICT 1 資訊及通訊科技（一）', date: new Date('2026-04-24T08:30:00') },
+            { paper: 'ICT 2 資訊及通訊科技（二）', date: new Date('2026-04-24T11:15:00') }
+        ]
+    },
+    'history': {
+        name: 'History 歷史',
+        englishName: 'History',
+        papers: [
+            { paper: 'History 1 歷史（一）', date: new Date('2026-04-25T08:30:00') },
+            { paper: 'History 2 歷史（二）', date: new Date('2026-04-25T11:15:00') }
+        ]
+    },
+    'bafs': {
+        name: 'Business, Accounting & Financial Studies 企業、會計與財務概論',
+        englishName: 'BAFS',
+        papers: [
+            { paper: '卷一', date: new Date('2026-04-27T08:30:00') },
+            { paper: '卷二', date: new Date('2026-04-27T10:15:00') }
+        ]
+    },
+    'pe': {
+        name: 'Physical Education 體育',
+        englishName: 'Physical Education',
+        papers: [
+            { paper: '卷一', date: new Date('2026-04-28T08:30:00') },
+            { paper: '卷二', date: new Date('2026-04-28T11:15:00') }
+        ]
+    },
+    'chinese_history': {
+        name: 'Chinese History 中國歷史',
+        englishName: 'Chinese History',
+        papers: [
+            { paper: '卷一', date: new Date('2026-04-29T08:30:00') },
+            { paper: '卷二', date: new Date('2026-04-29T11:30:00') }
+        ]
+    },
+    'maths_extended': {
+        name: 'Mathematics Extended Part 數學（延伸部分）',
+        englishName: 'Mathematics M1/M2',
+        papers: [
+            { paper: 'Modules 1,2 單元（一）及（二）', date: new Date('2026-04-30T08:30:00') }
+        ]
+    },
+    'tourism': {
+        name: 'Tourism & Hospitality Studies 旅遊與款待',
+        englishName: 'Tourism & Hospitality Studies',
+        papers: [
+            { paper: '卷一', date: new Date('2026-05-02T08:30:00') },
+            { paper: '卷二', date: new Date('2026-05-02T10:45:00') }
+        ]
+    },
+    'economics': {
+        name: 'Economics 經濟',
+        englishName: 'Economics',
+        papers: [
+            { paper: 'Economics 1 經濟（一）', date: new Date('2026-05-04T08:30:00') },
+            { paper: 'Economics 2 經濟（二）', date: new Date('2026-05-04T10:15:00') }
+        ]
+    },
+    'music': {
+        name: 'Music 音樂',
+        englishName: 'Music',
+        papers: [
+            { paper: '1A', date: new Date('2026-05-05T08:30:00') },
+            { paper: '1B', date: new Date('2026-05-05T10:45:00') }
         ]
     }
 };
@@ -118,18 +210,27 @@ const encouragementMessages = [
     'DSE 只係人生一個階段，保持心境！💖'
 ];
 
+// Get core subjects (cannot be deselected)
+function getCoreSubjects() {
+    return Object.keys(dseExams).filter(key => dseExams[key].isCore);
+}
+
 // Load saved subjects from localStorage
 function loadSavedSubjects() {
+    const coreSubjects = getCoreSubjects();
     const saved = localStorage.getItem('dse_selected_subjects');
     if (saved) {
         try {
-            return JSON.parse(saved);
+            const savedSubjects = JSON.parse(saved);
+            // Ensure core subjects are always included
+            const allSubjects = [...new Set([...coreSubjects, ...savedSubjects])];
+            return allSubjects;
         } catch (e) {
             console.warn('Failed to parse saved subjects from localStorage, using defaults:', e);
-            return Object.keys(dseExams);
+            return coreSubjects;
         }
     }
-    return Object.keys(dseExams);
+    return coreSubjects;
 }
 
 // Save selected subjects to localStorage
@@ -145,17 +246,31 @@ function createSubjectButtons() {
     const container = document.getElementById('subjectButtons');
     container.innerHTML = '';
     
+    const coreSubjects = getCoreSubjects();
+    
     Object.keys(dseExams).forEach(subjectKey => {
         const button = document.createElement('button');
         button.className = 'subject-btn';
         button.textContent = dseExams[subjectKey].name;
         button.dataset.subject = subjectKey;
         
+        const isCore = coreSubjects.includes(subjectKey);
+        
         if (selectedSubjects.includes(subjectKey)) {
             button.classList.add('selected');
         }
         
+        if (isCore) {
+            button.classList.add('core');
+            button.title = '核心科目（不可取消）';
+        }
+        
         button.addEventListener('click', () => {
+            // Core subjects cannot be deselected
+            if (isCore) {
+                return;
+            }
+            
             const index = selectedSubjects.indexOf(subjectKey);
             if (index > -1) {
                 selectedSubjects.splice(index, 1);
@@ -332,13 +447,100 @@ function rotateEncouragement() {
 // Initialize the app
 function init() {
     createSubjectButtons();
+    createHeroCountdown();
     updateCountdownDisplay();
     
     // Update countdowns every second
     setInterval(updateCountdowns, 1000);
+    setInterval(updateHeroCountdown, 1000);
     
     // Rotate encouragement message every 10 seconds
     setInterval(rotateEncouragement, 10000);
+}
+
+// Find first DSE written exam (earliest core subject exam)
+function getFirstDSEExam() {
+    const allExams = [];
+    Object.keys(dseExams).forEach(subjectKey => {
+        dseExams[subjectKey].papers.forEach(paper => {
+            allExams.push({
+                subjectKey,
+                subject: dseExams[subjectKey],
+                paper
+            });
+        });
+    });
+    
+    // Sort by date and return first one
+    allExams.sort((a, b) => a.paper.date - b.paper.date);
+    return allExams[0];
+}
+
+// Create hero countdown for the first DSE exam
+function createHeroCountdown() {
+    const container = document.getElementById('heroCountdown');
+    const firstExam = getFirstDSEExam();
+    
+    if (!firstExam) return;
+    
+    const timeRemaining = getTimeRemaining(firstExam.paper.date);
+    
+    if (timeRemaining.isPast) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="hero-title">第一場 DSE 筆試</div>
+        <div class="hero-subject">${firstExam.subject.name}</div>
+        <div class="hero-paper">${firstExam.paper.paper}</div>
+        <div class="hero-date">${formatDate(firstExam.paper.date)}</div>
+        <div class="hero-countdown-display" data-end="${firstExam.paper.date.toISOString()}">
+            <div class="hero-time-unit">
+                <span class="hero-time-value hero-days">${timeRemaining.days}</span>
+                <span class="hero-time-label">日</span>
+            </div>
+            <div class="hero-time-unit">
+                <span class="hero-time-value hero-hours">${timeRemaining.hours}</span>
+                <span class="hero-time-label">時</span>
+            </div>
+            <div class="hero-time-unit">
+                <span class="hero-time-value hero-minutes">${timeRemaining.minutes}</span>
+                <span class="hero-time-label">分</span>
+            </div>
+            <div class="hero-time-unit">
+                <span class="hero-time-value hero-seconds">${timeRemaining.seconds}</span>
+                <span class="hero-time-label">秒</span>
+            </div>
+        </div>
+    `;
+}
+
+// Update hero countdown
+function updateHeroCountdown() {
+    const heroDisplay = document.querySelector('.hero-countdown-display');
+    if (!heroDisplay) return;
+    
+    const endDateStr = heroDisplay.dataset.end;
+    if (!endDateStr) return;
+    
+    const endDate = new Date(endDateStr);
+    const timeRemaining = getTimeRemaining(endDate);
+    
+    if (timeRemaining.isPast) {
+        document.getElementById('heroCountdown').style.display = 'none';
+        return;
+    }
+    
+    const daysEl = heroDisplay.querySelector('.hero-days');
+    const hoursEl = heroDisplay.querySelector('.hero-hours');
+    const minutesEl = heroDisplay.querySelector('.hero-minutes');
+    const secondsEl = heroDisplay.querySelector('.hero-seconds');
+    
+    if (daysEl) daysEl.textContent = timeRemaining.days;
+    if (hoursEl) hoursEl.textContent = timeRemaining.hours;
+    if (minutesEl) minutesEl.textContent = timeRemaining.minutes;
+    if (secondsEl) secondsEl.textContent = timeRemaining.seconds;
 }
 
 // Start the app when DOM is loaded
