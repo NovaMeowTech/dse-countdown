@@ -7,10 +7,26 @@
 
 body {
     font-family: 'Microsoft JhengHei', 'PingFang TC', 'Heiti TC', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite;
     min-height: 100vh;
     color: #333;
     line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Background animation */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .container {
@@ -29,31 +45,62 @@ body {
 .title {
     font-size: 3em;
     color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5), 2px 2px 4px rgba(0, 0, 0, 0.3);
     margin-bottom: 10px;
-    animation: pulse 2s ease-in-out infinite;
+    animation: titleFloat 3s ease-in-out infinite;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+@keyframes titleFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
 }
 
 .subtitle {
     font-size: 1.2em;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.95);
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    animation: subtitleGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes subtitleGlow {
+    from {
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    }
+    to {
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.5);
+    }
 }
 
 /* Subject Selector Styles */
 .subject-selector {
-    background: white;
-    border-radius: 20px;
-    padding: 30px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    padding: 35px;
     margin-bottom: 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25), 0 5px 15px rgba(0, 0, 0, 0.1);
     animation: fadeIn 1s ease-out 0.2s both;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.subject-selector:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
 .subject-selector h2 {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     color: #667eea;
-    font-size: 1.5em;
+    font-size: 1.6em;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
 }
 
 .subject-buttons {
@@ -63,21 +110,40 @@ body {
 }
 
 .subject-btn {
-    padding: 12px 24px;
+    padding: 14px 28px;
     border: 2px solid #667eea;
-    background: white;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
     color: #667eea;
-    border-radius: 25px;
+    border-radius: 30px;
     cursor: pointer;
     font-size: 1em;
-    font-weight: 500;
-    transition: all 0.3s ease;
+    font-weight: 600;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.subject-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    transition: left 0.5s;
+}
+
+.subject-btn:hover::before {
+    left: 100%;
 }
 
 .subject-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    border-color: #764ba2;
 }
 
 .subject-btn.selected {
@@ -85,6 +151,17 @@ body {
     color: white;
     border-color: #764ba2;
     transform: scale(1.05);
+    box-shadow: 0 8px 30px rgba(118, 75, 162, 0.5);
+    animation: selectedPulse 2s ease-in-out infinite;
+}
+
+@keyframes selectedPulse {
+    0%, 100% {
+        box-shadow: 0 8px 30px rgba(118, 75, 162, 0.5);
+    }
+    50% {
+        box-shadow: 0 8px 40px rgba(118, 75, 162, 0.7), 0 0 20px rgba(118, 75, 162, 0.3);
+    }
 }
 
 .subject-btn.core {
@@ -93,102 +170,238 @@ body {
     border-color: #764ba2;
     cursor: default;
     position: relative;
+    box-shadow: 0 8px 30px rgba(118, 75, 162, 0.5);
 }
 
 .subject-btn.core::after {
     content: '🔒';
     margin-left: 5px;
     font-size: 0.8em;
+    animation: lockShake 3s ease-in-out infinite;
+}
+
+@keyframes lockShake {
+    0%, 90%, 100% {
+        transform: rotate(0deg);
+    }
+    92%, 96% {
+        transform: rotate(-10deg);
+    }
+    94%, 98% {
+        transform: rotate(10deg);
+    }
 }
 
 .subject-btn:active {
-    transform: scale(0.98);
+    transform: scale(0.95);
 }
 
 .subject-btn.core:hover {
-    transform: scale(1.05);
+    transform: scale(1.08);
+    box-shadow: 0 10px 35px rgba(118, 75, 162, 0.6);
 }
 
 /* Hero Countdown for First DSE Exam */
 .hero-countdown {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
-    border-radius: 30px;
-    padding: 50px 30px;
-    margin-bottom: 30px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 50%, #ffa726 100%);
+    background-size: 200% 200%;
+    animation: heroGradient 8s ease infinite, fadeIn 1s ease-out 0.1s both;
+    border-radius: 35px;
+    padding: 55px 35px;
+    margin-bottom: 35px;
     text-align: center;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-    animation: fadeIn 1s ease-out 0.1s both;
+    box-shadow: 0 20px 60px rgba(255, 107, 107, 0.4), 0 0 50px rgba(255, 142, 83, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-countdown::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: heroRotate 20s linear infinite;
+}
+
+@keyframes heroGradient {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes heroRotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .hero-title {
-    font-size: 2.5em;
+    font-size: 2.8em;
     color: white;
-    font-weight: bold;
-    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+    font-weight: 900;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.5), 3px 3px 8px rgba(0, 0, 0, 0.4);
     margin-bottom: 15px;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
+    animation: heroTitleBounce 2s ease-in-out infinite;
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes heroTitleBounce {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
 }
 
 .hero-subject {
-    font-size: 2em;
+    font-size: 2.2em;
     color: white;
-    font-weight: 600;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.4), 2px 2px 6px rgba(0, 0, 0, 0.3);
+    animation: heroFadeIn 1.5s ease-out;
+    position: relative;
+    z-index: 1;
 }
 
 .hero-paper {
-    font-size: 1.3em;
-    color: rgba(255, 255, 255, 0.95);
-    margin-bottom: 15px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    font-size: 1.4em;
+    color: rgba(255, 255, 255, 0.97);
+    margin-bottom: 18px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
 }
 
 .hero-date {
-    font-size: 1.5em;
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 30px;
-    font-weight: 600;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    font-size: 1.6em;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 35px;
+    font-weight: 700;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.3), 1px 1px 3px rgba(0, 0, 0, 0.2);
+    animation: datePulse 3s ease-in-out infinite;
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes datePulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+@keyframes heroFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .hero-countdown-display {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 30px;
+    gap: 25px;
     flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
 }
 
 .hero-time-unit {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 20px;
-    padding: 25px 30px;
-    backdrop-filter: blur(10px);
-    min-width: 120px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(15px);
+    border-radius: 25px;
+    padding: 28px 35px;
+    min-width: 130px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    animation: unitFloat 3s ease-in-out infinite;
+    transition: all 0.3s ease;
+}
+
+.hero-time-unit:hover {
+    transform: scale(1.1) translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.hero-time-unit:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.hero-time-unit:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.hero-time-unit:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+.hero-time-unit:nth-child(4) {
+    animation-delay: 0.6s;
+}
+
+@keyframes unitFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
 }
 
 .hero-time-value {
-    font-size: 4.5em;
-    font-weight: bold;
+    font-size: 5em;
+    font-weight: 900;
     color: white;
     display: block;
     line-height: 1;
-    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
-    animation: heroPulse 1.5s ease-in-out infinite;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.6), 3px 3px 8px rgba(0, 0, 0, 0.5);
+    animation: valueGlow 2s ease-in-out infinite;
+}
+
+@keyframes valueGlow {
+    0%, 100% {
+        text-shadow: 0 0 30px rgba(255, 255, 255, 0.6), 3px 3px 8px rgba(0, 0, 0, 0.5);
+        transform: scale(1);
+    }
+    50% {
+        text-shadow: 0 0 50px rgba(255, 255, 255, 0.9), 3px 3px 12px rgba(0, 0, 0, 0.6), 0 0 80px rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+    }
 }
 
 .hero-time-label {
-    font-size: 1.3em;
+    font-size: 1.4em;
     color: white;
-    margin-top: 10px;
+    margin-top: 12px;
     text-transform: uppercase;
-    font-weight: 600;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    font-weight: 700;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+    letter-spacing: 1px;
 }
 
 /* Countdown Grid */
@@ -202,17 +415,47 @@ body {
 
 /* Countdown Card Styles */
 .countdown-card {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
-    animation: slideInUp 0.5s ease-out;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: cardSlideIn 0.6s ease-out;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.countdown-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+    transition: left 0.6s;
+}
+
+.countdown-card:hover::before {
+    left: 100%;
 }
 
 .countdown-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3), 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .countdown-card.past {
@@ -221,29 +464,47 @@ body {
 }
 
 .card-header {
-    border-bottom: 2px solid #667eea;
-    padding-bottom: 15px;
-    margin-bottom: 15px;
+    border-bottom: 3px solid;
+    border-image: linear-gradient(90deg, #667eea, #764ba2) 1;
+    padding-bottom: 18px;
+    margin-bottom: 18px;
 }
 
 .subject-name {
-    font-size: 1.4em;
-    color: #667eea;
-    margin-bottom: 5px;
+    font-size: 1.5em;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    font-weight: 700;
 }
 
 .paper-name {
-    font-size: 1em;
+    font-size: 1.05em;
     color: #666;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .exam-date {
     text-align: center;
-    font-size: 1.1em;
-    color: #764ba2;
-    margin-bottom: 20px;
-    font-weight: 600;
+    font-size: 1.15em;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 22px;
+    font-weight: 700;
+    animation: dateShimmer 3s ease-in-out infinite;
+}
+
+@keyframes dateShimmer {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
 }
 
 /* Countdown Display */
@@ -262,12 +523,26 @@ body {
 }
 
 .time-value {
-    font-size: 2.5em;
-    font-weight: bold;
-    color: #667eea;
+    font-size: 2.8em;
+    font-weight: 900;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     display: block;
     line-height: 1;
-    animation: countdownPulse 1s ease-in-out infinite;
+    animation: numberPulse 2s ease-in-out infinite;
+}
+
+@keyframes numberPulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% {
+        transform: scale(1.08);
+        filter: brightness(1.2);
+    }
 }
 
 .time-label {
@@ -297,20 +572,70 @@ body {
 
 /* Encouragement Section */
 .encouragement {
-    background: white;
-    border-radius: 20px;
-    padding: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    padding: 45px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    margin-bottom: 30px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25), 0 5px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 35px;
     animation: fadeIn 1s ease-out 0.6s both;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.encouragement::before {
+    content: '✨';
+    position: absolute;
+    font-size: 3em;
+    top: 20px;
+    left: 20px;
+    animation: sparkleRotate 3s ease-in-out infinite;
+    opacity: 0.3;
+}
+
+.encouragement::after {
+    content: '🌟';
+    position: absolute;
+    font-size: 3em;
+    bottom: 20px;
+    right: 20px;
+    animation: sparkleRotate 3s ease-in-out infinite reverse;
+    opacity: 0.3;
+}
+
+@keyframes sparkleRotate {
+    0%, 100% {
+        transform: rotate(0deg) scale(1);
+    }
+    50% {
+        transform: rotate(180deg) scale(1.2);
+    }
 }
 
 #encouragementText {
-    font-size: 1.8em;
-    color: #667eea;
-    font-weight: 600;
-    transition: opacity 0.3s ease;
+    font-size: 2em;
+    background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    transition: all 0.5s ease;
+    animation: encourageGlow 3s ease-in-out infinite;
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes encourageGlow {
+    0%, 100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% {
+        transform: scale(1.03);
+        filter: brightness(1.2);
+    }
 }
 
 /* Footer */
@@ -343,36 +668,7 @@ body {
     }
 }
 
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 @keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-}
-
-@keyframes countdownPulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-}
-
-@keyframes heroPulse {
     0%, 100% {
         transform: scale(1);
     }
