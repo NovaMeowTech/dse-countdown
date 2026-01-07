@@ -1,5 +1,5 @@
 // DSE 2026 exam schedule (based on typical DSE schedule pattern)
-// Actual dates should be updated when official schedule is released
+// TODO: IMPORTANT - Update these dates when the official 2026 DSE schedule is released by HKEAA
 const dseExams = {
     'chinese': {
         name: '中國語文',
@@ -125,6 +125,7 @@ function loadSavedSubjects() {
         try {
             return JSON.parse(saved);
         } catch (e) {
+            console.warn('Failed to parse saved subjects from localStorage, using defaults:', e);
             return Object.keys(dseExams);
         }
     }
