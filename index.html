@@ -19,9 +19,65 @@
             <!-- Will be dynamically populated -->
         </div>
 
-        <div class="subject-selector">
-            <h2>選擇你嘅考試科目：</h2>
-            <div class="subject-buttons" id="subjectButtons"></div>
+        <!-- Freedom Countdown -->
+        <div class="freedom-countdown" id="freedomCountdown">
+            <!-- Will be dynamically populated -->
+        </div>
+
+        <div class="floating-controls">
+            <button id="articleBtn" class="control-btn" aria-label="每日一篇">
+                <span>📖 每日一篇</span>
+            </button>
+            <button id="settingsBtn" class="control-btn" aria-label="選擇科目">
+                <span>⚙️ 選擇科目</span>
+            </button>
+        </div>
+
+        <div id="subjectModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>選擇你嘅考試科目</h2>
+                    <span class="close-modal" id="closeSubjectModal">&times;</span>
+                </div>
+                <!-- ... content ... -->
+                <div class="modal-body">
+                    <div class="subject-buttons" id="subjectButtons"></div>
+                    
+                    <div class="custom-dates-section" id="customDateInputs">
+                        <h3>自訂考試日期 Custom Dates</h3>
+                        <div class="date-input-group">
+                            <label for="engOralDate">英國語文（四）（口試） English Language Paper 4 (Speaking)</label>
+                            <div class="input-wrapper">
+                                <input type="datetime-local" id="engOralDate">
+                                <button id="clearOralDate" class="clear-btn" title="清除 Clear">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="saveBtn" class="save-btn">儲存並開始</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="articleModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>每日一篇 Article of the Day</h2>
+                    <span class="close-modal" id="closeArticleModal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="daily-article-container" id="dailyArticle">
+                        <!-- Daily article content -->
+                    </div>
+                    <div class="articles-list-section">
+                        <h3>範文列表 All Articles</h3>
+                        <div class="articles-list" id="articlesList">
+                            <!-- List of all 12 articles -->
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="countdown-grid" id="countdownGrid">
@@ -37,6 +93,9 @@
         </footer>
     </div>
 
+    <script src="dse_articles.js"></script>
+    <script src="chem_game.js"></script>
+    <script src="bafs_game.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

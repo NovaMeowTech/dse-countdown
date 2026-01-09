@@ -253,13 +253,33 @@ function loadSavedSubjects() {
     return coreSubjects;
 }
 
+// Load custom dates from localStorage
+function loadCustomDates() {
+    const saved = localStorage.getItem('dse_custom_dates');
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch (e) {
+            console.warn('Failed to parse saved dates:', e);
+            return {};
+        }
+    }
+    return {};
+}
+
 // Save selected subjects to localStorage
 function saveSelectedSubjects(subjects) {
     localStorage.setItem('dse_selected_subjects', JSON.stringify(subjects));
 }
 
-// Initialize selected subjects
+// Save custom dates
+function saveCustomDates(dates) {
+    localStorage.setItem('dse_custom_dates', JSON.stringify(dates));
+}
+
+// Initialize selected subjects and custom dates
 let selectedSubjects = loadSavedSubjects();
+let customDates = loadCustomDates();
 
 // Create subject selection buttons
 function createSubjectButtons() {
@@ -300,11 +320,70 @@ function createSubjectButtons() {
                 button.classList.add('selected');
             }
             saveSelectedSubjects(selectedSubjects);
-            updateCountdownDisplay();
         });
         
         container.appendChild(button);
     });
+
+    // Setup custom date inputs
+    const customDateContainer = document.getElementById('customDateInputs');
+    if (customDateContainer) {
+        const engOralInput = document.getElementById('engOralDate');
+        if (engOralInput && customDates.englishOral) {
+            engOralInput.value = customDates.englishOral;
+        }
+    }
+}
+
+// Modal handling
+function initModal() {
+    const modal = document.getElementById('subjectModal');
+    const btn = document.getElementById('settingsBtn');
+    const span = document.getElementsByClassName('close-modal')[0];
+    const saveBtn = document.getElementById('saveBtn');
+    const clearOralBtn = document.getElementById('clearOralDate');
+    const engOralInput = document.getElementById('engOralDate');
+
+    if (clearOralBtn && engOralInput) {
+        clearOralBtn.onclick = function() {
+            engOralInput.value = '';
+            delete customDates.englishOral;
+            saveCustomDates(customDates);
+        }
+    }
+
+    btn.onclick = function() {
+        modal.style.display = "flex";
+        setTimeout(() => modal.classList.add('show'), 10);
+        createSubjectButtons(); // Refresh buttons state
+    }
+
+    const closeModal = function() {
+        modal.classList.remove('show');
+        setTimeout(() => modal.style.display = "none", 300);
+    }
+
+    span.onclick = closeModal;
+
+    saveBtn.onclick = function() {
+        // Save custom dates
+        const engOralInput = document.getElementById('engOralDate');
+        if (engOralInput) {
+            customDates.englishOral = engOralInput.value;
+            saveCustomDates(customDates);
+        }
+
+        updateCountdownDisplay();
+        createHeroCountdown();
+        createFreedomCountdown();
+        closeModal();
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
 }
 
 // Calculate time remaining
@@ -387,6 +466,8 @@ function createCountdownCard(subjectKey, paper) {
             </div>
             `}
         </div>
+        ${subjectKey === 'chemistry' ? `<button class="chem-practice-btn" onclick="openChemGame()">🧪 Practice Chemistry</button>` : ''}
+        ${subjectKey === 'bafs' ? `<button class="bafs-practice-btn" onclick="openBafsGame()">📊 Practice BAFS</button>` : ''}
     `;
     
     return card;
@@ -409,6 +490,20 @@ function updateCountdownDisplay() {
             });
         }
     });
+
+    // Add custom exams
+    if (customDates.englishOral && selectedSubjects.includes('english')) {
+        const oralDate = new Date(customDates.englishOral);
+        if (!isNaN(oralDate.getTime())) {
+            allPapers.push({
+                subjectKey: 'english',
+                paper: {
+                    paper: 'English Language 4 (Speaking) 英國語文（四）（口試）',
+                    date: oralDate
+                }
+            });
+        }
+    }
     
     allPapers.sort((a, b) => a.paper.date - b.paper.date);
     
@@ -423,6 +518,7 @@ function updateCountdownDisplay() {
     });
 }
 
+
 // Update all countdowns
 function updateCountdowns() {
     const countdownDisplays = document.querySelectorAll('.countdown-display');
@@ -435,8 +531,12 @@ function updateCountdowns() {
         const timeRemaining = getTimeRemaining(endDate);
         
         if (timeRemaining.isPast) {
-            display.innerHTML = '<div class="exam-done">考試已完成 ✓</div>';
-            display.parentElement.classList.add('past');
+            if (!display.innerHTML.includes('exam-done')) {
+                display.innerHTML = '<div class="exam-done">考試已完成 ✓</div>';
+                display.parentElement.classList.add('past');
+                // Re-evaluate hero if current hero becomes past
+                createHeroCountdown();
+            }
             return;
         }
         
@@ -467,74 +567,115 @@ function rotateEncouragement() {
 // Initialize the app
 function init() {
     createSubjectButtons();
+    initModal();
+    initArticleModal();
     createHeroCountdown();
+    createFreedomCountdown();
     updateCountdownDisplay();
     
     // Update all countdowns every second (combined for efficiency)
     setInterval(() => {
         updateCountdowns();
         updateHeroCountdown();
+        updateFreedomCountdown();
     }, 1000);
     
     // Rotate encouragement message every 10 seconds
     setInterval(rotateEncouragement, 10000);
 }
 
-// Find first DSE written exam (earliest core subject exam)
-function getFirstDSEExam() {
+// Find first upcoming selected exam
+function getFirstUpcomingExam() {
     const allExams = [];
-    Object.keys(dseExams).forEach(subjectKey => {
-        dseExams[subjectKey].papers.forEach(paper => {
-            allExams.push({
-                subjectKey,
-                subject: dseExams[subjectKey],
-                paper
+    selectedSubjects.forEach(subjectKey => {
+        if (dseExams[subjectKey]) {
+            dseExams[subjectKey].papers.forEach(paper => {
+                const timeRemaining = getTimeRemaining(paper.date);
+                if (!timeRemaining.isPast) {
+                    allExams.push({
+                        subjectKey,
+                        subject: dseExams[subjectKey],
+                        paper
+                    });
+                }
             });
-        });
+        }
     });
+
+    // Add custom exams to upcoming check
+    if (customDates.englishOral && selectedSubjects.includes('english')) {
+        const oralDate = new Date(customDates.englishOral);
+        if (!isNaN(oralDate.getTime())) {
+            const timeRemaining = getTimeRemaining(oralDate);
+            if (!timeRemaining.isPast) {
+                allExams.push({
+                    subjectKey: 'english',
+                    subject: dseExams['english'],
+                    paper: {
+                        paper: 'English Language 4 (Speaking) 英國語文（四）（口試）',
+                        date: oralDate
+                    }
+                });
+            }
+        }
+    }
     
     // Sort by date and return first one
     allExams.sort((a, b) => a.paper.date - b.paper.date);
     return allExams[0];
 }
 
-// Create hero countdown for the first DSE exam
+// Create hero countdown for the first upcoming exam
 function createHeroCountdown() {
     const container = document.getElementById('heroCountdown');
-    const firstExam = getFirstDSEExam();
+    const firstExam = getFirstUpcomingExam();
     
-    if (!firstExam) return;
-    
-    const timeRemaining = getTimeRemaining(firstExam.paper.date);
-    
-    if (timeRemaining.isPast) {
+    if (!firstExam) {
         container.style.display = 'none';
         return;
     }
     
+    container.style.display = 'block';
+    
+    const timeRemaining = getTimeRemaining(firstExam.paper.date);
+    
+    // Animate change if content is different
+    const currentSubject = container.querySelector('.hero-subject')?.textContent;
+    if (currentSubject && currentSubject !== firstExam.subject.name) {
+        container.style.opacity = '0';
+        setTimeout(() => {
+            renderHeroContent(container, firstExam, timeRemaining);
+            container.style.opacity = '1';
+        }, 300);
+    } else {
+        renderHeroContent(container, firstExam, timeRemaining);
+    }
+}
+
+function renderHeroContent(container, firstExam, timeRemaining) {
     container.innerHTML = `
-        <div class="hero-title">第一場 DSE 筆試</div>
+        <div class="hero-title">下一個考試 First Upcoming Exam</div>
         <div class="hero-subject">${firstExam.subject.name}</div>
         <div class="hero-paper">${firstExam.paper.paper}</div>
-        <div class="hero-date">${formatDate(firstExam.paper.date)}</div>
         <div class="hero-countdown-display" data-end="${firstExam.paper.date.toISOString()}">
             <div class="hero-time-unit">
                 <span class="hero-time-value hero-days">${timeRemaining.days}</span>
-                <span class="hero-time-label">日</span>
+                <span class="hero-time-label">日 Days</span>
             </div>
             <div class="hero-time-unit">
                 <span class="hero-time-value hero-hours">${timeRemaining.hours}</span>
-                <span class="hero-time-label">時</span>
+                <span class="hero-time-label">時 Hrs</span>
             </div>
             <div class="hero-time-unit">
                 <span class="hero-time-value hero-minutes">${timeRemaining.minutes}</span>
-                <span class="hero-time-label">分</span>
+                <span class="hero-time-label">分 Mins</span>
             </div>
             <div class="hero-time-unit">
                 <span class="hero-time-value hero-seconds">${timeRemaining.seconds}</span>
-                <span class="hero-time-label">秒</span>
+                <span class="hero-time-label">秒 Secs</span>
             </div>
         </div>
+        <div class="hero-date">${formatDate(firstExam.paper.date)}</div>
     `;
 }
 
@@ -550,7 +691,8 @@ function updateHeroCountdown() {
     const timeRemaining = getTimeRemaining(endDate);
     
     if (timeRemaining.isPast) {
-        document.getElementById('heroCountdown').style.display = 'none';
+        // If the current hero exam is past, refresh to find the next one
+        createHeroCountdown();
         return;
     }
     
@@ -563,6 +705,348 @@ function updateHeroCountdown() {
     if (hoursEl) hoursEl.textContent = timeRemaining.hours;
     if (minutesEl) minutesEl.textContent = timeRemaining.minutes;
     if (secondsEl) secondsEl.textContent = timeRemaining.seconds;
+}
+
+// Freedom Countdown Logic
+function getFreedomDate() {
+    let maxDate = null;
+
+    selectedSubjects.forEach(subjectKey => {
+        if (dseExams[subjectKey]) {
+            dseExams[subjectKey].papers.forEach(paper => {
+                if (!maxDate || paper.date > maxDate) {
+                    maxDate = paper.date;
+                }
+            });
+        }
+    });
+
+    // Check custom dates
+    if (customDates.englishOral && selectedSubjects.includes('english')) {
+         const oralDate = new Date(customDates.englishOral);
+        if (!maxDate || oralDate > maxDate) {
+            maxDate = oralDate;
+        }
+    }
+
+    return maxDate;
+}
+
+function createFreedomCountdown() {
+    const container = document.getElementById('freedomCountdown');
+    const freedomDate = getFreedomDate();
+
+    if (!freedomDate) {
+        container.style.display = 'none';
+        return;
+    }
+
+    container.style.display = 'block';
+    const timeRemaining = getTimeRemaining(freedomDate);
+    
+    container.innerHTML = `
+        <div class="freedom-title">🎉 Countdown to Freedom 🎉</div>
+        <div class="freedom-display" data-end="${freedomDate.toISOString()}">
+            <div class="freedom-unit">
+                <span class="freedom-value freedom-days">${timeRemaining.days}</span>
+                <span class="freedom-label">日 Days</span>
+            </div>
+            <div class="freedom-unit">
+                <span class="freedom-value freedom-hours">${timeRemaining.hours}</span>
+                <span class="freedom-label">時 Hrs</span>
+            </div>
+            <div class="freedom-unit">
+                <span class="freedom-value freedom-minutes">${timeRemaining.minutes}</span>
+                <span class="freedom-label">分 Mins</span>
+            </div>
+            <div class="freedom-unit">
+                <span class="freedom-value freedom-seconds">${timeRemaining.seconds}</span>
+                <span class="freedom-label">秒 Secs</span>
+            </div>
+        </div>
+        <div class="freedom-date">Last Exam: ${formatDate(freedomDate)}</div>
+    `;
+}
+
+function updateFreedomCountdown() {
+    const display = document.querySelector('.freedom-display');
+    if (!display) return;
+    
+    const endDateStr = display.dataset.end;
+    if (!endDateStr) return;
+    
+    const endDate = new Date(endDateStr);
+    const timeRemaining = getTimeRemaining(endDate);
+    
+    if (timeRemaining.isPast) {
+         document.getElementById('freedomCountdown').innerHTML = `
+            <div class="freedom-title">🎉 YOU ARE FREE! 🎉</div>
+            <div class="freedom-value" style="margin: 20px 0;">Enjoy your holiday!</div>
+         `;
+         return;
+    }
+    
+    const daysEl = display.querySelector('.freedom-days');
+    const hoursEl = display.querySelector('.freedom-hours');
+    const minutesEl = display.querySelector('.freedom-minutes');
+    const secondsEl = display.querySelector('.freedom-seconds');
+    
+    if (daysEl) daysEl.textContent = timeRemaining.days;
+    if (hoursEl) hoursEl.textContent = timeRemaining.hours;
+    if (minutesEl) minutesEl.textContent = timeRemaining.minutes;
+    if (secondsEl) secondsEl.textContent = timeRemaining.seconds;
+}
+
+// DSE 12 Prescribed Texts
+// Loaded from dse_articles.js
+const dseArticles = typeof dseArticlesData !== 'undefined' ? dseArticlesData : [];
+
+// Article Modal Handling
+function initArticleModal() {
+    const modal = document.getElementById('articleModal');
+    const btn = document.getElementById('articleBtn');
+    const closeBtn = document.getElementById('closeArticleModal');
+    
+    if (!btn || !modal) return;
+
+    btn.onclick = function() {
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+        renderArticles();
+    }
+
+    const closeModal = function() {
+        modal.classList.remove('show');
+        setTimeout(() => modal.style.display = 'none', 300);
+    }
+
+    if (closeBtn) closeBtn.onclick = closeModal;
+
+    window.addEventListener('click', function(event) {
+        if (event.target == modal) {
+            closeModal();
+        }
+    });
+
+    renderArticles();
+}
+
+function getRandomSentence(article) {
+    if (!article.paragraphs || article.paragraphs.length === 0) return article.quote;
+    const fullText = article.paragraphs.join('');
+    const sentences = fullText.match(/[^。？！\s]+[。？！]/g);
+    if (!sentences || sentences.length === 0) return article.quote;
+    const candidates = sentences.filter(s => s.length > 5 && s.length < 80);
+    return candidates.length > 0 ? candidates[Math.floor(Math.random() * candidates.length)] : article.quote;
+}
+
+function renderArticles() {
+    const dailyContainer = document.getElementById('dailyArticle');
+    const listContainer = document.getElementById('articlesList');
+    
+    // Pick article of the day based on day of year
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const diff = now - start;
+    const oneDay = 1000 * 60 * 60 * 24;
+    const dayOfYear = Math.floor(diff / oneDay);
+    const dailyIndex = dayOfYear % dseArticles.length;
+    const dailyArticle = dseArticles[dailyIndex];
+
+    dailyContainer.innerHTML = `
+        <div class="daily-label">每日一篇 Article of the Day</div>
+        <h3 class="daily-title">${dailyArticle.title}</h3>
+        <div class="daily-author">${dailyArticle.author}</div>
+        <div class="daily-quote">「${getRandomSentence(dailyArticle)}」</div>
+        <button class="recite-btn" onclick="startRecitationGame(${dailyIndex})">🎤 挑戰背誦 Challenge Recitation</button>
+    `;
+
+    listContainer.innerHTML = '';
+    dseArticles.forEach((article, index) => {
+        const item = document.createElement('div');
+        item.className = `article-item ${index === dailyIndex ? 'active' : ''}`;
+        item.innerHTML = `
+            <span>${article.title}</span>
+            <span style="font-size: 0.8em; color: #718096;">${article.author}</span>
+        `;
+        item.onclick = () => {
+             dailyContainer.innerHTML = `
+                <div class="daily-label">${index === dailyIndex ? '每日一篇 Article of the Day' : 'Selected Article'}</div>
+                <h3 class="daily-title">${article.title}</h3>
+                <div class="daily-author">${article.author}</div>
+                <div class="daily-quote">「${getRandomSentence(article)}」</div>
+                <button class="recite-btn" onclick="startRecitationGame(${index})">🎤 挑戰背誦 Challenge Recitation</button>
+            `;
+            document.querySelectorAll('.article-item').forEach(el => el.classList.remove('active'));
+            item.classList.add('active');
+        };
+        listContainer.appendChild(item);
+    });
+}
+
+let currentGame = {
+    paragraphIndex: 0,
+    quote: '',
+    slots: [],
+    filled: {},
+    correctCount: 0
+};
+
+window.startRecitationGame = function(index) {
+    const article = dseArticles[index];
+    
+    // Start with first paragraph
+    currentGame.paragraphIndex = 0;
+    renderGame(index);
+};
+
+window.renderGame = function(articleIndex) {
+    const article = dseArticles[articleIndex];
+    const container = document.getElementById('dailyArticle');
+    
+    const paragraphText = article.paragraphs[currentGame.paragraphIndex];
+    
+    // Check if it's a title placeholder (for poetry sections like "山居秋暝 (王維)")
+    // If so, and it's short, we might skip it or just show it fully.
+    // For simplicity, let's treat everything as game text, but maybe mask less if it's short?
+    
+    let html = '';
+    let characters = [];
+    let slotIndex = 0;
+    
+    // Reset local game state for this paragraph
+    currentGame.quote = paragraphText; // Using 'quote' to mean current paragraph
+    currentGame.slots = [];
+    currentGame.filled = {};
+    currentGame.correctCount = 0;
+
+    const tokens = paragraphText.split('');
+    let slotHtml = '';
+    
+    tokens.forEach((char, i) => {
+        // Keep punctuation visible, and spaces
+        if (/[，。；？！：、「」『』\s]/.test(char) || char === ' ') {
+            slotHtml += char;
+        } else {
+            // 40% chance to mask character
+            if (Math.random() > 0.4) {
+                currentGame.slots.push({
+                    index: slotIndex,
+                    answer: char
+                });
+                characters.push({ char, id: slotIndex }); 
+                slotHtml += `<span class="word-slot" id="slot-${slotIndex}" onclick="returnWord(${slotIndex})"></span>`;
+                slotIndex++;
+            } else {
+                slotHtml += char;
+            }
+        }
+    });
+
+    // Shuffle characters
+    characters.sort(() => Math.random() - 0.5);
+    
+    let optionsHtml = '';
+    characters.forEach(item => {
+        optionsHtml += `<div class="word-chip" id="chip-${item.id}" onclick="placeWord('${item.char}', ${item.id})">${item.char}</div>`;
+    });
+    
+    // Navigation buttons
+    const hasNext = currentGame.paragraphIndex < article.paragraphs.length - 1;
+    const hasPrev = currentGame.paragraphIndex > 0;
+    
+    const navButtons = `
+        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+            ${hasPrev ? `<button class="recite-btn" style="padding: 8px 16px; font-size: 0.9em;" onclick="prevParagraph(${articleIndex})">⬅️ Prev</button>` : ''}
+            <span style="align-self: center; color: #718096;">Section ${currentGame.paragraphIndex + 1} / ${article.paragraphs.length}</span>
+            ${hasNext ? `<button class="recite-btn" style="padding: 8px 16px; font-size: 0.9em;" onclick="nextParagraph(${articleIndex})">Next ➡️</button>` : ''}
+        </div>
+    `;
+
+    container.innerHTML = `
+        <div class="game-container">
+            <h3 class="daily-title">${article.title}</h3>
+            <div class="game-instruction">Fill in the blanks to complete the paragraph</div>
+            <div class="game-quote-area" id="gameArea">${slotHtml}</div>
+            <div class="game-options-area">${optionsHtml}</div>
+            <div class="game-result" id="gameResult"></div>
+            ${navButtons}
+            <button class="recite-btn" style="background: #e2e8f0; color: #4a5568; margin-top: 10px;" onclick="renderArticles()">Back to Menu</button>
+        </div>
+    `;
+};
+
+window.nextParagraph = function(index) {
+    currentGame.paragraphIndex++;
+    renderGame(index);
+}
+
+window.prevParagraph = function(index) {
+    currentGame.paragraphIndex--;
+    renderGame(index);
+}
+
+window.placeWord = function(char, chipId) {
+    // Find first empty slot
+    const emptySlot = currentGame.slots.find(s => !currentGame.filled[s.index]);
+    
+    if (emptySlot) {
+        const slotEl = document.getElementById(`slot-${emptySlot.index}`);
+        const chipEl = document.getElementById(`chip-${chipId}`);
+        
+        if (chipEl.classList.contains('used')) return;
+        
+        // Fill logic
+        slotEl.textContent = char;
+        slotEl.classList.add('filled');
+        currentGame.filled[emptySlot.index] = { char, chipId };
+        
+        chipEl.classList.add('used');
+        
+        // Check Correctness immediately (Optional) or check completion
+        checkCompletion();
+    }
+};
+
+window.returnWord = function(slotIndex) {
+    const filledData = currentGame.filled[slotIndex];
+    if (filledData) {
+        const slotEl = document.getElementById(`slot-${slotIndex}`);
+        const chipEl = document.getElementById(`chip-${filledData.chipId}`);
+        
+        slotEl.textContent = '';
+        slotEl.classList.remove('filled', 'correct', 'wrong');
+        
+        chipEl.classList.remove('used');
+        delete currentGame.filled[slotIndex];
+    }
+};
+
+function checkCompletion() {
+    // Check if all slots are filled
+    const allFilled = currentGame.slots.every(s => currentGame.filled[s.index]);
+    
+    if (allFilled) {
+        let isAllCorrect = true;
+        
+        currentGame.slots.forEach(slot => {
+            const filledChar = currentGame.filled[slot.index].char;
+            const slotEl = document.getElementById(`slot-${slot.index}`);
+            
+            if (filledChar === slot.answer) {
+                slotEl.classList.add('correct');
+            } else {
+                slotEl.classList.add('wrong');
+                isAllCorrect = false;
+            }
+        });
+        
+        if (isAllCorrect) {
+            const resultEl = document.getElementById('gameResult');
+            resultEl.textContent = 'Excellent! 背誦成功! 🎉';
+            // Celebration effect could be added here
+        }
+    }
 }
 
 // Start the app when DOM is loaded
