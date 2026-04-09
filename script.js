@@ -465,7 +465,7 @@ function createCountdownCard(subjectKey, paper, index) {
     }
 
     // Stagger entrance animation
-    card.style.animationDelay = `${index * 60}ms`;
+    card.style.animationDelay = `${index * CARD_ENTRANCE_STAGGER_MS}ms`;
 
     const toggleMaximize = () => {
         const isMaximized = card.classList.toggle('maximized');
@@ -616,11 +616,13 @@ function buildExamDoneHTML() {
 
 // Spawn CSS confetti particles inside a card
 const CONFETTI_COLORS = ['#68d391','#4299e1','#f6ad55','#fc8181','#b794f4','#76e4f7'];
+const CONFETTI_COUNT = 14;
+const CARD_ENTRANCE_STAGGER_MS = 60;
+
 function spawnConfetti(card) {
     const container = card.querySelector('.confetti-container');
     if (!container) return;
-    const count = 14;
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < CONFETTI_COUNT; i++) {
         const piece = document.createElement('div');
         piece.className = 'confetti-piece';
         piece.style.left = `${Math.random() * 90 + 5}%`;

@@ -89,6 +89,8 @@ body::before {
     50%       { box-shadow: var(--shadow-glow), var(--shadow-md); }
 }
 
+.hero-countdown {
+
 /* Finished-exam star pop */
 @keyframes starPop {
     0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
@@ -556,6 +558,7 @@ body::before {
     overflow: hidden;
     box-shadow: var(--shadow-lg);
     animation: glowPulse 5s ease-in-out infinite;
+    will-change: box-shadow;
 }
 
 /* Animated top stripe */
