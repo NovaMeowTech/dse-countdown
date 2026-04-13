@@ -632,7 +632,7 @@ const CARD_ENTRANCE_STAGGER_MS = 60;
 const STUDY_SEASON_START = new Date('2026-01-01T00:00:00');
 const RING_R              = 26;
 const RING_CIRCUM         = 2 * Math.PI * RING_R; // ≈ 163.4
-const SPARKLE_COLORS      = ['#4299e1', '#38b2ac', '#9f7aea', '#f6ad55', '#68d391'];
+const SPARKLE_COLORS      = ['#4F46E5', '#7C3AED', '#EC4899', '#6366F1', '#A78BFA'];
 
 function spawnConfetti(card) {
     const container = card.querySelector('.confetti-container');
@@ -1170,10 +1170,10 @@ if (document.readyState === 'loading') {
 
 function createBackgroundOrbs() {
     const ORB_CONFIG = [
-        { color: '#4361ee', size: 520, left: '8%',  top: '12%', dur: 22, delay: 0 },
-        { color: '#9f7aea', size: 420, left: '72%', top: '58%', dur: 26, delay: -7 },
-        { color: '#38b2ac', size: 360, left: '52%', top: '5%',  dur: 18, delay: -4 },
-        { color: '#f6ad55', size: 300, left: '18%', top: '72%', dur: 24, delay: -11 },
+        { color: '#4F46E5', size: 520, left: '8%',  top: '12%', dur: 22, delay: 0 },
+        { color: '#7C3AED', size: 420, left: '72%', top: '58%', dur: 26, delay: -7 },
+        { color: '#EC4899', size: 360, left: '52%', top: '5%',  dur: 18, delay: -4 },
+        { color: '#6366F1', size: 300, left: '18%', top: '72%', dur: 24, delay: -11 },
     ];
     ORB_CONFIG.forEach(({ color, size, left, top, dur, delay }) => {
         const orb = document.createElement('div');
@@ -1188,9 +1188,9 @@ function createBackgroundOrbs() {
     });
 }
 
-// ── Exam season stats helper ────────────────────────────────
+// ── Sorted papers helper ────────────────────────────────────
 
-function getExamStats() {
+function getAllSelectedPapersSorted() {
     const allPapers = [];
     selectedSubjects.forEach(key => {
         if (dseExams[key]) {
@@ -1206,20 +1206,21 @@ function getExamStats() {
             });
         }
     }
+    allPapers.sort((a, b) => a.paper.date - b.paper.date);
+    return allPapers;
+}
+
+// ── Exam season stats helper ────────────────────────────────
+
+function getExamStats() {
+    const allPapers = getAllSelectedPapersSorted();
     const now   = new Date();
     const total = allPapers.length;
     const done  = allPapers.filter(p => p.paper.date < now).length;
-    let firstDate = null, lastDate = null;
-    allPapers.forEach(({ paper }) => {
-        if (!firstDate || paper.date < firstDate) firstDate = paper.date;
-        if (!lastDate  || paper.date > lastDate)  lastDate  = paper.date;
-    });
-    let seasonPct = 0;
-    if (firstDate && lastDate && lastDate > firstDate) {
-        const span    = lastDate - firstDate;
-        const elapsed = now - firstDate;
-        seasonPct = Math.min(100, Math.max(0, (elapsed / span) * 100));
-    }
+    const firstDate = allPapers.length > 0 ? allPapers[0].paper.date : null;
+    const lastDate  = allPapers.length > 0 ? allPapers[allPapers.length - 1].paper.date : null;
+    // Progress is based on number of papers done, not time elapsed
+    const seasonPct = total > 0 ? (done / total) * 100 : 0;
     return { total, done, remaining: total - done, firstDate, lastDate, seasonPct };
 }
 
@@ -1232,6 +1233,20 @@ function createExamProgressSection() {
     if (stats.total === 0) { container.style.display = 'none'; return; }
     container.style.display = '';
     const pctRounded = Math.round(stats.seasonPct);
+
+    const now = new Date();
+    const sortedPapers = getAllSelectedPapersSorted();
+    const nextIndex = sortedPapers.findIndex(item => item.paper.date >= now);
+
+    const dotsHTML = sortedPapers.map((item, i) => {
+        const isPast = item.paper.date < now;
+        const isNext = i === nextIndex;
+        const subjectName = dseExams[item.key]?.name || '';
+        const paperName = item.paper.paper;
+        return `<div class="paper-dot ${isPast ? 'done' : ''} ${isNext ? 'next' : ''}"
+                     title="${subjectName}: ${paperName}"
+                     aria-label="${subjectName}: ${paperName}"></div>`;
+    }).join('');
 
     container.innerHTML = `
         <div class="season-progress-header">
@@ -1255,7 +1270,23 @@ function createExamProgressSection() {
                 共 <span id="statTotal">${stats.total}</span> 場 Total Papers
             </span>
         </div>
+        <div class="paper-dots-row" id="paperDotsRow">${dotsHTML}</div>
     `;
+}
+
+function updatePaperDotsState() {
+    const dotsRow = document.getElementById('paperDotsRow');
+    if (!dotsRow) return;
+    const now = new Date();
+    const sortedPapers = getAllSelectedPapersSorted();
+    const nextIndex = sortedPapers.findIndex(item => item.paper.date >= now);
+    const dots = dotsRow.querySelectorAll('.paper-dot');
+    dots.forEach((dot, i) => {
+        const isPast = sortedPapers[i]?.paper.date < now;
+        const isNext = i === nextIndex;
+        dot.classList.toggle('done', isPast);
+        dot.classList.toggle('next', isNext && !isPast);
+    });
 }
 
 function updateExamProgressSection() {
@@ -1269,20 +1300,31 @@ function updateExamProgressSection() {
     const pct = Math.round(stats.seasonPct);
     fill.style.width    = `${Math.max(pct, 0.5)}%`;
     if (pctEl)  pctEl.textContent  = `${pct}%`;
-    if (doneEl) doneEl.textContent = stats.done;
+    if (doneEl) {
+        const prevDone = parseInt(doneEl.textContent, 10);
+        if (prevDone !== stats.done) updatePaperDotsState();
+        doneEl.textContent = stats.done;
+    }
     if (remEl)  remEl.textContent  = stats.remaining;
     if (totEl)  totEl.textContent  = stats.total;
 }
 
 // ── Per-card countdown progress bar ────────────────────────
 
+// Returns { rank: 1-based position, total } for an exam date in the sorted sequence
+function getExamSequenceRank(examDate) {
+    const allPapers = getAllSelectedPapersSorted();
+    const total = allPapers.length;
+    if (total === 0) return { rank: 1, total: 1 };
+    const examTime = examDate.getTime();
+    // Papers that come strictly before this one gives 0-based index; add 1 for 1-based rank
+    const rank = allPapers.filter(p => p.paper.date.getTime() < examTime).length + 1;
+    return { rank, total };
+}
+
 function getCardProgress(examDate) {
-    const now   = new Date();
-    const start = STUDY_SEASON_START;
-    const span  = examDate - start;
-    if (span <= 0) return 100;
-    const elapsed = now - start;
-    return Math.min(100, Math.max(0, (elapsed / span) * 100));
+    const { rank, total } = getExamSequenceRank(examDate);
+    return Math.min(100, (rank / total) * 100);
 }
 
 function getProgressClass(pct) {
@@ -1294,16 +1336,17 @@ function getProgressClass(pct) {
 
 function buildCardProgressHTML(examDate, isPast) {
     if (isPast) return '';
-    const pct   = getCardProgress(examDate);
-    const cls   = getProgressClass(pct);
+    const { rank, total } = getExamSequenceRank(examDate);
+    const pct = (rank / total) * 100;
+    const cls = getProgressClass(pct);
     const label = cls === 'urgent'   ? '⚠️ 緊急 Urgent'   :
                   cls === 'warning'  ? '🔥 注意 Attention' :
                   cls === 'moderate' ? '📅 進行中'         : '✅ 充裕 Plenty of time';
     return `
         <div class="card-progress-wrap">
             <div class="card-progress-label">
-                <span>備考進度 Prep Progress</span>
-                <span>${label} · ${Math.round(pct)}%</span>
+                <span>考試進度 Exam Progress</span>
+                <span>${label} · Paper ${rank}/${total}</span>
             </div>
             <div class="card-progress-track">
                 <div class="card-progress-bar ${cls}" style="width:${pct}%"></div>
@@ -1321,8 +1364,8 @@ function buildHeroProgressRingHTML(pct) {
             <svg class="hero-progress-svg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%"   stop-color="var(--accent)" />
-                        <stop offset="100%" stop-color="var(--accent-2)" />
+                        <stop offset="0%"   stop-color="#A78BFA" />
+                        <stop offset="100%" stop-color="#EC4899" />
                     </linearGradient>
                 </defs>
                 <circle class="hero-progress-svg-bg"   cx="32" cy="32" r="${RING_R}" />

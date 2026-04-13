@@ -6,29 +6,30 @@
 }
 
 :root {
-    --bg: #f0f4f8;
+    --bg: #f2f1ff;
     --surface: #ffffff;
-    --surface-2: #f8fafc;
-    --surface-glass: rgba(255, 255, 255, 0.78);
-    --text: #1a202c;
-    --muted: #4a5568;
-    --muted-2: #718096;
-    --border: #e2e8f0;
-    --accent: #2b5876;
-    --accent-2: #38b2ac;
-    --success: #38a169;
-    --danger: #e53e3e;
-    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.07), 0 1px 2px rgba(15, 23, 42, 0.04);
-    --shadow-md: 0 4px 24px rgba(15, 23, 42, 0.09), 0 2px 8px rgba(15, 23, 42, 0.05);
-    --shadow-lg: 0 20px 60px -10px rgba(15, 23, 42, 0.16), 0 8px 20px -4px rgba(15, 23, 42, 0.08);
-    --shadow-glow: 0 0 0 3px rgba(43, 88, 118, 0.14), 0 4px 24px rgba(43, 88, 118, 0.10);
+    --surface-2: #f8f7ff;
+    --surface-glass: rgba(255, 255, 255, 0.80);
+    --text: #1a1560;
+    --muted: #4a4580;
+    --muted-2: #7670a0;
+    --border: #e4e2f5;
+    --accent: #4F46E5;
+    --accent-2: #7C3AED;
+    --accent-3: #EC4899;
+    --success: #059669;
+    --danger: #DC2626;
+    --shadow-sm: 0 1px 3px rgba(79, 70, 229, 0.07), 0 1px 2px rgba(79, 70, 229, 0.04);
+    --shadow-md: 0 4px 24px rgba(79, 70, 229, 0.10), 0 2px 8px rgba(79, 70, 229, 0.06);
+    --shadow-lg: 0 20px 60px -10px rgba(79, 70, 229, 0.18), 0 8px 20px -4px rgba(79, 70, 229, 0.10);
+    --shadow-glow: 0 0 0 3px rgba(79, 70, 229, 0.16), 0 4px 24px rgba(79, 70, 229, 0.12);
     --radius-md: 16px;
     --radius-lg: 24px;
-    --dash: rgba(45, 55, 72, 0.18);
+    --dash: rgba(79, 70, 229, 0.14);
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', sans-serif;
     background: var(--bg);
     min-height: 100vh;
     color: var(--text);
@@ -42,7 +43,7 @@ body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background-image: radial-gradient(rgba(43, 88, 118, 0.07) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(79, 70, 229, 0.07) 1px, transparent 1px);
     background-size: 28px 28px;
     pointer-events: none;
     z-index: 0;
@@ -85,8 +86,8 @@ body::before {
 
 /* Gentle glow pulse for hero */
 @keyframes glowPulse {
-    0%, 100% { box-shadow: var(--shadow-md); }
-    50%       { box-shadow: var(--shadow-glow), var(--shadow-md); }
+    0%, 100% { box-shadow: 0 20px 80px -15px rgba(79, 70, 229, 0.45), 0 8px 30px rgba(79, 70, 229, 0.25); }
+    50%       { box-shadow: 0 24px 100px -10px rgba(124, 58, 237, 0.55), 0 10px 40px rgba(124, 58, 237, 0.3); }
 }
 
 /* Finished-exam star pop */
@@ -130,16 +131,17 @@ body::before {
 
 .title {
     font-size: 3.1em;
-    color: var(--text);
-    margin-bottom: 10px;
     font-weight: 800;
     letter-spacing: -0.5px;
     display: inline-block;
     padding: 10px 22px;
     border-radius: 999px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
+    background: linear-gradient(135deg, #1e1b4b 0%, var(--accent) 55%, var(--accent-2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    border: 1.5px solid rgba(79, 70, 229, 0.18);
+    box-shadow: 0 4px 20px rgba(79, 70, 229, 0.10), var(--shadow-sm);
     line-height: 1.15;
     position: relative;
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
@@ -147,7 +149,7 @@ body::before {
 
 .title:hover {
     transform: translateY(-2px) scale(1.01);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 30px rgba(79, 70, 229, 0.18), var(--shadow-md);
 }
 
 .title::after {
@@ -158,7 +160,7 @@ body::before {
     bottom: -8px;
     height: 3px;
     border-radius: 999px;
-    background: linear-gradient(90deg, transparent, rgba(43, 88, 118, 0.28), transparent);
+    background: linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.35), var(--accent-2), transparent);
 }
 
 .subtitle {
@@ -546,15 +548,15 @@ body::before {
 
 /* Hero Section */
 .hero-countdown {
-    background: linear-gradient(145deg, #ffffff 0%, #f7faff 100%);
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 35%, #4c1d95 72%, #1a3a6e 100%);
     border-radius: 26px;
     padding: 56px 44px 48px;
     margin-bottom: 50px;
-    border: 1px solid var(--border);
-    border-left: 6px solid var(--accent);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-left: none;
     position: relative;
     overflow: hidden;
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 20px 80px -15px rgba(79, 70, 229, 0.45), 0 8px 30px rgba(79, 70, 229, 0.25), var(--shadow-lg);
     animation: glowPulse 5s ease-in-out infinite;
     will-change: box-shadow;
 }
@@ -567,7 +569,7 @@ body::before {
     left: -60%;
     width: 40%;
     height: 3px;
-    background: linear-gradient(90deg, transparent, var(--accent-2), var(--accent), transparent);
+    background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.8), #a78bfa, rgba(236, 72, 153, 0.7), transparent);
     animation: shimmerSlide 3s linear infinite;
 }
 
@@ -579,15 +581,15 @@ body::before {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: var(--bg);
-    border: 2px solid rgba(43, 88, 118, 0.18);
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(255, 255, 255, 0.16);
     box-shadow:
-        0 46px 0 0 var(--bg),
-        0 46px 0 2px rgba(43, 88, 118, 0.18),
-        0 92px 0 0 var(--bg),
-        0 92px 0 2px rgba(43, 88, 118, 0.18),
-        0 138px 0 0 var(--bg),
-        0 138px 0 2px rgba(43, 88, 118, 0.18);
+        0 46px 0 0 rgba(255, 255, 255, 0.08),
+        0 46px 0 2px rgba(255, 255, 255, 0.16),
+        0 92px 0 0 rgba(255, 255, 255, 0.08),
+        0 92px 0 2px rgba(255, 255, 255, 0.16),
+        0 138px 0 0 rgba(255, 255, 255, 0.08),
+        0 138px 0 2px rgba(255, 255, 255, 0.16);
     pointer-events: none;
 }
 
@@ -595,7 +597,7 @@ body::before {
     font-size: 1.1em;
     text-transform: uppercase;
     letter-spacing: 2.2px;
-    color: var(--muted);
+    color: rgba(199, 193, 255, 0.75);
     margin-bottom: 15px;
     font-weight: 700;
 }
@@ -603,18 +605,18 @@ body::before {
 .hero-subject {
     font-size: clamp(2em, 5vw, 3.8em);
     font-weight: 800;
-    color: var(--text);
+    color: #ffffff;
     line-height: 1.1;
     margin-bottom: 10px;
 }
 
 .hero-paper {
     font-size: clamp(1em, 2.5vw, 1.8em);
-    color: var(--muted);
+    color: rgba(199, 193, 255, 0.72);
     font-weight: 400;
     margin-bottom: 40px;
     padding-bottom: 18px;
-    border-bottom: 1px dashed var(--dash);
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.14);
 }
 
 .hero-countdown-display {
@@ -631,26 +633,29 @@ body::before {
     align-items: baseline;
     justify-content: center;
     gap: 10px;
-    background: var(--surface);
+    background: rgba(255, 255, 255, 0.09);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     padding: 22px 28px;
     border-radius: 20px;
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     flex: 1 1 140px;
     max-width: 200px;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
 }
 
 .hero-time-unit:hover {
     transform: translateY(-4px) scale(1.04);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    background: rgba(255, 255, 255, 0.14);
 }
 
 .hero-time-value {
     font-size: clamp(2.2em, 4.5vw, 3.5em);
     font-variant-numeric: tabular-nums;
     font-weight: 800;
-    color: var(--accent);
+    color: #ffffff;
     line-height: 1;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
@@ -658,7 +663,7 @@ body::before {
 .hero-time-label {
     font-size: 1.1em;
     letter-spacing: 1px;
-    color: var(--muted);
+    color: rgba(199, 193, 255, 0.8);
     margin-top: 0;
     font-weight: 600;
 }
@@ -666,7 +671,7 @@ body::before {
 .hero-date {
      margin-top: 30px;
      font-size: 1.2em;
-    color: var(--muted);
+    color: rgba(199, 193, 255, 0.65);
      font-weight: 500;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     letter-spacing: 0.3px;
@@ -680,8 +685,10 @@ body::before {
 }
 
 .countdown-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(18px) saturate(1.6);
+    -webkit-backdrop-filter: blur(18px) saturate(1.6);
+    border: 1px solid rgba(255, 255, 255, 0.92);
     border-radius: 20px;
     padding: 28px 24px;
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -703,7 +710,7 @@ body::before {
     bottom: 14px;
     width: 5px;
     border-radius: 999px;
-    background: rgba(43, 88, 118, 0.18);
+    background: rgba(79, 70, 229, 0.16);
     transition: background 0.3s ease;
 }
 
@@ -716,14 +723,14 @@ body::before {
     height: 10px;
     border-radius: 50%;
     background: var(--bg);
-    border: 2px solid rgba(43, 88, 118, 0.18);
+    border: 2px solid rgba(79, 70, 229, 0.16);
     box-shadow:
         0 44px 0 0 var(--bg),
-        0 44px 0 2px rgba(43, 88, 118, 0.18),
+        0 44px 0 2px rgba(79, 70, 229, 0.16),
         0 88px 0 0 var(--bg),
-        0 88px 0 2px rgba(43, 88, 118, 0.18),
+        0 88px 0 2px rgba(79, 70, 229, 0.16),
         0 132px 0 0 var(--bg),
-        0 132px 0 2px rgba(43, 88, 118, 0.18);
+        0 132px 0 2px rgba(79, 70, 229, 0.16);
     pointer-events: none;
 }
 
@@ -818,7 +825,7 @@ body::before {
 .countdown-card:hover {
     transform: translateY(-5px) scale(1.01);
     box-shadow: var(--shadow-md);
-    border-color: rgba(43, 88, 118, 0.22);
+    border-color: rgba(79, 70, 229, 0.22);
 }
 
 .countdown-card:hover::before {
@@ -833,9 +840,10 @@ body::before {
 
 .subject-name {
     font-size: 1.4em;
-    color: var(--text);
-    background: none;
-    -webkit-text-fill-color: initial;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin-bottom: 5px;
     font-weight: 700;
 }
@@ -968,17 +976,20 @@ body::before {
 
 /* Finished card visual */
 .countdown-card.past {
-    background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
-    border-color: rgba(56, 161, 105, 0.30);
-    box-shadow: 0 2px 14px rgba(56, 161, 105, 0.10);
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-color: rgba(5, 150, 105, 0.30);
+    box-shadow: 0 2px 14px rgba(5, 150, 105, 0.10);
 }
 
 .countdown-card.past::before {
-    background: linear-gradient(to bottom, #68d391, var(--accent-2));
+    background: linear-gradient(to bottom, #34d399, #059669);
 }
 
 .countdown-card.past .subject-name {
-    color: #276749;
+    background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .countdown-card.past .exam-date {
@@ -987,13 +998,13 @@ body::before {
 }
 
 .countdown-card.past:hover {
-    box-shadow: 0 6px 22px rgba(56, 161, 105, 0.16);
-    border-color: rgba(56, 161, 105, 0.42);
+    box-shadow: 0 6px 22px rgba(5, 150, 105, 0.18);
+    border-color: rgba(5, 150, 105, 0.42);
     transform: translateY(-4px) scale(1.01);
 }
 
 .countdown-card.past:hover::before {
-    background: linear-gradient(to bottom, #48bb78, #38b2ac);
+    background: linear-gradient(to bottom, #34d399, #10b981);
 }
 
 .no-subjects {
@@ -1010,8 +1021,8 @@ body::before {
 /* Encouragement */
 .encouragement {
     margin-top: 55px;
-    background: linear-gradient(135deg, #ffffff 0%, #f0fff4 55%, #e6fffa 100%);
-    border: 1px solid rgba(56, 178, 172, 0.22);
+    background: linear-gradient(135deg, #faf9ff 0%, #f0effe 55%, #ede9fe 100%);
+    border: 1px solid rgba(79, 70, 229, 0.18);
     box-shadow: var(--shadow-md);
     border-radius: 22px;
     padding: 48px 30px;
@@ -1030,7 +1041,7 @@ body::before {
     left: -60%;
     width: 40%;
     height: 3px;
-    background: linear-gradient(90deg, transparent, var(--accent-2), transparent);
+    background: linear-gradient(90deg, transparent, var(--accent-2), var(--accent), transparent);
     animation: shimmerSlide 4s linear infinite;
 }
 
@@ -1052,11 +1063,14 @@ body::before {
 
 #encouragementText {
     font-size: clamp(1.3em, 3.5vw, 2em);
-    color: var(--text);
     font-weight: 800;
     position: relative;
     z-index: 1;
     transition: opacity 0.35s ease, transform 0.35s ease;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent) 60%, var(--accent-2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 #encouragementText.fade-out {
@@ -1136,10 +1150,12 @@ body::before {
     
     .hero-subject {
         font-size: 2em;
+        color: #ffffff;
     }
     
     .hero-paper {
         font-size: 1.1em;
+        color: rgba(199, 193, 255, 0.72);
     }
     
     .hero-date {
@@ -1202,10 +1218,12 @@ body::before {
 
     .hero-subject {
         font-size: 1.7em;
+        color: #ffffff;
     }
     
     .hero-paper {
         font-size: 0.95em;
+        color: rgba(199, 193, 255, 0.72);
     }
     
     .hero-date {
@@ -1735,10 +1753,10 @@ body::after {
     position: fixed;
     inset: 0;
     background:
-        radial-gradient(ellipse at 12% 18%, rgba(67, 97, 238, 0.055) 0%, transparent 52%),
-        radial-gradient(ellipse at 82% 72%, rgba(159, 122, 234, 0.055) 0%, transparent 50%),
-        radial-gradient(ellipse at 58% 8%,  rgba(56, 178, 172, 0.045) 0%, transparent 44%),
-        radial-gradient(ellipse at 28% 82%, rgba(246, 173, 85, 0.04)  0%, transparent 42%);
+        radial-gradient(ellipse at 12% 18%, rgba(79, 70, 229, 0.065) 0%, transparent 52%),
+        radial-gradient(ellipse at 82% 72%, rgba(124, 58, 237, 0.065) 0%, transparent 50%),
+        radial-gradient(ellipse at 58% 8%,  rgba(236, 72, 153, 0.045) 0%, transparent 44%),
+        radial-gradient(ellipse at 28% 82%, rgba(99, 102, 241, 0.05)  0%, transparent 42%);
     pointer-events: none;
     z-index: 0;
     animation: bgGradientShift 18s ease-in-out infinite;
@@ -1959,10 +1977,10 @@ body::after {
 /* Override hover to support tilt (tilt handled by JS; default hover still works) */
 .countdown-card:not(.maximized):hover {
     box-shadow:
-        0 16px 40px -8px rgba(43, 88, 118, 0.22),
-        0 6px 16px -4px rgba(43, 88, 118, 0.14),
-        0 0 0 1px rgba(43, 88, 118, 0.10);
-    border-color: rgba(43, 88, 118, 0.28);
+        0 16px 40px -8px rgba(79, 70, 229, 0.22),
+        0 6px 16px -4px rgba(79, 70, 229, 0.14),
+        0 0 0 1px rgba(79, 70, 229, 0.10);
+    border-color: rgba(79, 70, 229, 0.25);
 }
 
 /* ── Hero section pulse ring ───────────────────────────────── */
@@ -2009,7 +2027,7 @@ body::after {
 
 .hero-progress-svg-bg {
     fill: none;
-    stroke: rgba(43, 88, 118, 0.10);
+    stroke: rgba(255, 255, 255, 0.14);
     stroke-width: 5;
 }
 
@@ -2024,7 +2042,7 @@ body::after {
 .hero-ring-label {
     font-size: 0.7em;
     font-weight: 700;
-    color: var(--muted);
+    color: rgba(199, 193, 255, 0.65);
     text-align: center;
     letter-spacing: 0.4px;
     line-height: 1.2;
@@ -2033,7 +2051,7 @@ body::after {
 .hero-ring-pct {
     font-size: 0.85em;
     font-weight: 800;
-    color: var(--accent-2);
+    color: rgba(255, 255, 255, 0.92);
     text-align: center;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
@@ -2042,20 +2060,20 @@ body::after {
 
 :root {
     --shadow-card-hover:
-        0 20px 50px -10px rgba(43, 88, 118, 0.22),
-        0 8px 20px -4px rgba(43, 88, 118, 0.14),
+        0 20px 50px -10px rgba(79, 70, 229, 0.22),
+        0 8px 20px -4px rgba(79, 70, 229, 0.14),
         0 2px 8px rgba(15, 23, 42, 0.05);
     --shadow-hero-glow:
-        0 0 0 3px rgba(43, 88, 118, 0.12),
-        0 8px 40px -8px rgba(43, 88, 118, 0.22),
-        0 30px 80px -20px rgba(43, 88, 118, 0.12);
+        0 0 0 3px rgba(79, 70, 229, 0.12),
+        0 8px 40px -8px rgba(79, 70, 229, 0.22),
+        0 30px 80px -20px rgba(124, 58, 237, 0.14);
     --shadow-progress:
-        0 4px 20px rgba(43, 88, 118, 0.12),
+        0 4px 20px rgba(79, 70, 229, 0.12),
         0 1px 4px rgba(15, 23, 42, 0.05);
 }
 
 .hero-countdown {
-    box-shadow: var(--shadow-hero-glow), var(--shadow-md);
+    box-shadow: 0 20px 80px -15px rgba(79, 70, 229, 0.45), 0 8px 30px rgba(79, 70, 229, 0.25), var(--shadow-lg);
 }
 
 .sparkle-particle {
@@ -2085,3 +2103,142 @@ body::after {
     }
     .season-stat { font-size: 0.8em; }
 }
+
+/* ── Paper dots progress row ───────────────────────────────── */
+
+.paper-dots-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--dash);
+    align-items: center;
+}
+
+.paper-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: help;
+    position: relative;
+}
+
+.paper-dot.done {
+    background: var(--success);
+    border-color: var(--success);
+    box-shadow: 0 0 6px rgba(5, 150, 105, 0.45);
+    transform: scale(1.15);
+}
+
+.paper-dot.next {
+    background: var(--accent);
+    border-color: var(--accent);
+    width: 16px;
+    height: 16px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(79, 70, 229, 0.55);
+    animation: nextDotPulse 2s ease-in-out infinite;
+    transform: scale(1);
+}
+
+@keyframes nextDotPulse {
+    0%, 100% {
+        box-shadow: 0 0 6px rgba(79, 70, 229, 0.4), 0 0 0 0 rgba(79, 70, 229, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 14px rgba(79, 70, 229, 0.7), 0 0 0 5px rgba(79, 70, 229, 0.0);
+    }
+}
+
+@media (max-width: 480px) {
+    .paper-dot { width: 9px; height: 9px; }
+    .paper-dot.next { width: 13px; height: 13px; }
+    .paper-dots-row { gap: 4px; }
+}
+
+/* ── Control button glow ──────────────────────────────────── */
+
+.control-btn {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(79, 70, 229, 0.16);
+    box-shadow: 0 4px 20px rgba(79, 70, 229, 0.10), var(--shadow-sm);
+}
+
+.control-btn:hover {
+    border-color: rgba(79, 70, 229, 0.32);
+    color: var(--accent);
+    background: var(--surface);
+    box-shadow: 0 8px 30px rgba(79, 70, 229, 0.18), var(--shadow-md);
+}
+
+/* ── Season progress fill gradient ───────────────────────── */
+
+.season-progress-fill {
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 60%, var(--accent-3) 100%);
+}
+
+.season-progress-fill::before {
+    border-color: var(--accent-2);
+    box-shadow: 0 0 8px rgba(124, 58, 237, 0.6), 0 0 20px rgba(124, 58, 237, 0.3);
+}
+
+/* ── Progress ring glow for heroProgressGlow ─────────────── */
+
+@keyframes heroProgressGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+    50%       { box-shadow: 0 0 14px 4px rgba(79, 70, 229, 0.22); }
+}
+
+/* ── Exam progress section shimmer colours ───────────────── */
+
+.exam-progress-section::after {
+    background: linear-gradient(90deg, transparent, var(--accent-2), var(--accent), transparent);
+}
+
+/* ── Freedom countdown refresh ────────────────────────────── */
+
+.freedom-countdown {
+    background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 55%, #ede9fe 100%);
+    border: 1px solid rgba(167, 139, 250, 0.28);
+    border-left: 6px solid var(--accent-2);
+    box-shadow: 0 4px 24px rgba(124, 58, 237, 0.12), var(--shadow-sm);
+}
+
+.freedom-countdown:hover {
+    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.20), var(--shadow-md);
+}
+
+.freedom-countdown::after {
+    background: linear-gradient(90deg, transparent, var(--accent-2), var(--accent-3), transparent);
+}
+
+.freedom-title {
+    color: #4c1d95;
+}
+
+.freedom-value {
+    color: #5b21b6;
+}
+
+.freedom-unit {
+    background: rgba(255, 255, 255, 0.65);
+    border-color: rgba(167, 139, 250, 0.30);
+}
+
+.freedom-label {
+    color: #6d28d9;
+}
+
+.freedom-date {
+    color: #5b21b6;
+}
+
+
+
