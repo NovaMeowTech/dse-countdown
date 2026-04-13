@@ -1311,15 +1311,20 @@ function updateExamProgressSection() {
 
 // ── Per-card countdown progress bar ────────────────────────
 
-function getCardProgress(examDate) {
-    // Progress = position of this paper in the sorted exam sequence
+// Returns { rank: 1-based position, total } for an exam date in the sorted sequence
+function getExamSequenceRank(examDate) {
     const allPapers = getAllSelectedPapersSorted();
     const total = allPapers.length;
-    if (total === 0) return 0;
+    if (total === 0) return { rank: 1, total: 1 };
     const examTime = examDate.getTime();
-    // 1-based rank: how many papers come before (or at) this date
-    const position = allPapers.filter(p => p.paper.date.getTime() < examTime).length;
-    return Math.min(100, ((position + 1) / total) * 100);
+    // Papers that come strictly before this one gives 0-based index; add 1 for 1-based rank
+    const rank = allPapers.filter(p => p.paper.date.getTime() < examTime).length + 1;
+    return { rank, total };
+}
+
+function getCardProgress(examDate) {
+    const { rank, total } = getExamSequenceRank(examDate);
+    return Math.min(100, (rank / total) * 100);
 }
 
 function getProgressClass(pct) {
@@ -1331,11 +1336,8 @@ function getProgressClass(pct) {
 
 function buildCardProgressHTML(examDate, isPast) {
     if (isPast) return '';
-    const allPapers = getAllSelectedPapersSorted();
-    const total = allPapers.length;
-    const examTime = examDate.getTime();
-    const position = allPapers.filter(p => p.paper.date.getTime() < examTime).length + 1;
-    const pct = total > 0 ? (position / total) * 100 : 0;
+    const { rank, total } = getExamSequenceRank(examDate);
+    const pct = (rank / total) * 100;
     const cls = getProgressClass(pct);
     const label = cls === 'urgent'   ? '⚠️ 緊急 Urgent'   :
                   cls === 'warning'  ? '🔥 注意 Attention' :
@@ -1344,7 +1346,7 @@ function buildCardProgressHTML(examDate, isPast) {
         <div class="card-progress-wrap">
             <div class="card-progress-label">
                 <span>考試進度 Exam Progress</span>
-                <span>${label} · Paper ${position}/${total}</span>
+                <span>${label} · Paper ${rank}/${total}</span>
             </div>
             <div class="card-progress-track">
                 <div class="card-progress-bar ${cls}" style="width:${pct}%"></div>
