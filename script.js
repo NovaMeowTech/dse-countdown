@@ -382,6 +382,7 @@ function initModal() {
         updateCountdownDisplay();
         createHeroCountdown();
         createFreedomCountdown();
+        createExamProgressSection();
         closeModal();
     }
 
@@ -447,9 +448,14 @@ function updateTextWithTick(el, value) {
     void el.offsetWidth;
     el.classList.add('countdown-tick');
 
+    // Sparkle burst on hero large numbers only (keeps UI clean elsewhere)
+    if (el.closest && el.closest('.hero-countdown') && el.classList.contains('hero-time-value')) {
+        spawnSparkles(el);
+    }
+
     window.setTimeout(() => {
         el.classList.remove('countdown-tick');
-    }, 170);
+    }, 300);
 }
 
 // Create countdown card for a paper
@@ -503,6 +509,7 @@ function createCountdownCard(subjectKey, paper, index) {
         </div>
         ${subjectKey === 'chemistry' ? `<button class="chem-practice-btn" onclick="openChemGame(event)">🧪 Practice Chemistry</button>` : ''}
         ${subjectKey === 'bafs' ? `<button class="bafs-practice-btn" onclick="openBafsGame(event)">📊 Practice BAFS</button>` : ''}
+        ${buildCardProgressHTML(paper.date, isPast)}
     `;
 
     if (isPast) {
@@ -514,6 +521,8 @@ function createCountdownCard(subjectKey, paper, index) {
         e.stopPropagation();
         toggleMaximize();
     };
+
+    addCardTiltEffect(card);
     
     return card;
 }
@@ -619,6 +628,12 @@ const CONFETTI_COLORS = ['#68d391','#4299e1','#f6ad55','#fc8181','#b794f4','#76e
 const CONFETTI_COUNT = 14;
 const CARD_ENTRANCE_STAGGER_MS = 60;
 
+// Premium UI — constants for progress bars and sparkles
+const STUDY_SEASON_START = new Date('2026-01-01T00:00:00');
+const RING_R              = 26;
+const RING_CIRCUM         = 2 * Math.PI * RING_R; // ≈ 163.4
+const SPARKLE_COLORS      = ['#4299e1', '#38b2ac', '#9f7aea', '#f6ad55', '#68d391'];
+
 function spawnConfetti(card) {
     const container = card.querySelector('.confetti-container');
     if (!container) return;
@@ -656,12 +671,16 @@ function init() {
     createHeroCountdown();
     createFreedomCountdown();
     updateCountdownDisplay();
+    createBackgroundOrbs();
+    createExamProgressSection();
     
     // Update all countdowns every second (combined for efficiency)
     setInterval(() => {
         updateCountdowns();
         updateHeroCountdown();
         updateFreedomCountdown();
+        updateExamProgressSection();
+        updateHeroProgressRing();
     }, 1000);
     
     // Rotate encouragement message every 10 seconds
@@ -737,6 +756,8 @@ function createHeroCountdown() {
 }
 
 function renderHeroContent(container, firstExam, timeRemaining) {
+    const stats = getExamStats();
+    const ringHTML = buildHeroProgressRingHTML(stats.seasonPct);
     container.innerHTML = `
         <div class="hero-title">下一個考試 First Upcoming Exam</div>
         <div class="hero-subject">${firstExam.subject.name}</div>
@@ -760,6 +781,7 @@ function renderHeroContent(container, firstExam, timeRemaining) {
             </div>
         </div>
         <div class="hero-date">${formatDate(firstExam.paper.date)}</div>
+        ${ringHTML}
     `;
 }
 
@@ -1139,3 +1161,249 @@ if (document.readyState === 'loading') {
 } else {
     init();
 }
+
+/* ═══════════════════════════════════════════════════════════
+   PREMIUM UI ENHANCEMENTS
+   ═══════════════════════════════════════════════════════════ */
+
+// ── Background floating orbs ────────────────────────────────
+
+function createBackgroundOrbs() {
+    const ORB_CONFIG = [
+        { color: '#4361ee', size: 520, left: '8%',  top: '12%', dur: 22, delay: 0 },
+        { color: '#9f7aea', size: 420, left: '72%', top: '58%', dur: 26, delay: -7 },
+        { color: '#38b2ac', size: 360, left: '52%', top: '5%',  dur: 18, delay: -4 },
+        { color: '#f6ad55', size: 300, left: '18%', top: '72%', dur: 24, delay: -11 },
+    ];
+    ORB_CONFIG.forEach(({ color, size, left, top, dur, delay }) => {
+        const orb = document.createElement('div');
+        orb.className = 'bg-orb';
+        orb.style.cssText = [
+            `width:${size}px`, `height:${size}px`,
+            `left:${left}`,    `top:${top}`,
+            `background:${color}`,
+            `--orb-dur:${dur}s`, `--orb-delay:${delay}s`,
+        ].join(';');
+        document.body.appendChild(orb);
+    });
+}
+
+// ── Exam season stats helper ────────────────────────────────
+
+function getExamStats() {
+    const allPapers = [];
+    selectedSubjects.forEach(key => {
+        if (dseExams[key]) {
+            dseExams[key].papers.forEach(p => allPapers.push({ key, paper: p }));
+        }
+    });
+    if (customDates.englishOral && selectedSubjects.includes('english')) {
+        const d = new Date(customDates.englishOral);
+        if (!isNaN(d.getTime())) {
+            allPapers.push({
+                key: 'english',
+                paper: { paper: 'English Language 4 (Speaking)', date: d }
+            });
+        }
+    }
+    const now   = new Date();
+    const total = allPapers.length;
+    const done  = allPapers.filter(p => p.paper.date < now).length;
+    let firstDate = null, lastDate = null;
+    allPapers.forEach(({ paper }) => {
+        if (!firstDate || paper.date < firstDate) firstDate = paper.date;
+        if (!lastDate  || paper.date > lastDate)  lastDate  = paper.date;
+    });
+    let seasonPct = 0;
+    if (firstDate && lastDate && lastDate > firstDate) {
+        const span    = lastDate - firstDate;
+        const elapsed = now - firstDate;
+        seasonPct = Math.min(100, Math.max(0, (elapsed / span) * 100));
+    }
+    return { total, done, remaining: total - done, firstDate, lastDate, seasonPct };
+}
+
+// ── Overall DSE season progress section ────────────────────
+
+function createExamProgressSection() {
+    const container = document.getElementById('examProgressSection');
+    if (!container) return;
+    const stats = getExamStats();
+    if (stats.total === 0) { container.style.display = 'none'; return; }
+    container.style.display = '';
+    const pctRounded = Math.round(stats.seasonPct);
+
+    container.innerHTML = `
+        <div class="season-progress-header">
+            <span class="season-progress-title">📊 DSE Exam Season Progress</span>
+            <span class="season-progress-pct" id="seasonPct">${pctRounded}%</span>
+        </div>
+        <div class="season-progress-track">
+            <div class="season-progress-fill" id="seasonFill" style="width:${Math.max(pctRounded, 0.5)}%"></div>
+        </div>
+        <div class="season-progress-stats">
+            <span class="season-stat">
+                <span class="season-stat-dot done"></span>
+                <span id="statDone">${stats.done}</span> 考試已完成 Done
+            </span>
+            <span class="season-stat">
+                <span class="season-stat-dot remain"></span>
+                <span id="statRemain">${stats.remaining}</span> 考試待考 Remaining
+            </span>
+            <span class="season-stat">
+                <span class="season-stat-dot total"></span>
+                共 <span id="statTotal">${stats.total}</span> 場 Total Papers
+            </span>
+        </div>
+    `;
+}
+
+function updateExamProgressSection() {
+    const stats   = getExamStats();
+    const fill    = document.getElementById('seasonFill');
+    const pctEl   = document.getElementById('seasonPct');
+    const doneEl  = document.getElementById('statDone');
+    const remEl   = document.getElementById('statRemain');
+    const totEl   = document.getElementById('statTotal');
+    if (!fill) return;
+    const pct = Math.round(stats.seasonPct);
+    fill.style.width    = `${Math.max(pct, 0.5)}%`;
+    if (pctEl)  pctEl.textContent  = `${pct}%`;
+    if (doneEl) doneEl.textContent = stats.done;
+    if (remEl)  remEl.textContent  = stats.remaining;
+    if (totEl)  totEl.textContent  = stats.total;
+}
+
+// ── Per-card countdown progress bar ────────────────────────
+
+function getCardProgress(examDate) {
+    const now   = new Date();
+    const start = STUDY_SEASON_START;
+    const span  = examDate - start;
+    if (span <= 0) return 100;
+    const elapsed = now - start;
+    return Math.min(100, Math.max(0, (elapsed / span) * 100));
+}
+
+function getProgressClass(pct) {
+    if (pct >= 90) return 'urgent';
+    if (pct >= 70) return 'warning';
+    if (pct >= 45) return 'moderate';
+    return 'ok';
+}
+
+function buildCardProgressHTML(examDate, isPast) {
+    if (isPast) return '';
+    const pct   = getCardProgress(examDate);
+    const cls   = getProgressClass(pct);
+    const label = cls === 'urgent'   ? '⚠️ 緊急 Urgent'   :
+                  cls === 'warning'  ? '🔥 注意 Attention' :
+                  cls === 'moderate' ? '📅 進行中'         : '✅ 充裕 Plenty of time';
+    return `
+        <div class="card-progress-wrap">
+            <div class="card-progress-label">
+                <span>備考進度 Prep Progress</span>
+                <span>${label} · ${Math.round(pct)}%</span>
+            </div>
+            <div class="card-progress-track">
+                <div class="card-progress-bar ${cls}" style="width:${pct}%"></div>
+            </div>
+        </div>`;
+}
+
+// ── Hero progress ring ──────────────────────────────────────
+// (RING_R and RING_CIRCUM are declared near the top of the file)
+
+function buildHeroProgressRingHTML(pct) {
+    const dashOffset = RING_CIRCUM * (1 - pct / 100);
+    return `
+        <div class="hero-progress-ring-wrap">
+            <svg class="hero-progress-svg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%"   stop-color="var(--accent)" />
+                        <stop offset="100%" stop-color="var(--accent-2)" />
+                    </linearGradient>
+                </defs>
+                <circle class="hero-progress-svg-bg"   cx="32" cy="32" r="${RING_R}" />
+                <circle class="hero-progress-svg-fill" cx="32" cy="32" r="${RING_R}"
+                    stroke-dasharray="${RING_CIRCUM}"
+                    stroke-dashoffset="${dashOffset}" />
+            </svg>
+            <span class="hero-ring-pct" id="heroRingPct">${Math.round(pct)}%</span>
+            <span class="hero-ring-label">Season</span>
+        </div>`;
+}
+
+// ── renderHeroContent patch is done inline in renderHeroContent() below ──
+// ── createCountdownCard patch is done inline in createCountdownCard() below ──
+
+// Update the ring percentage every second
+function updateHeroProgressRing() {
+    const stats   = getExamStats();
+    const pctEl   = document.getElementById('heroRingPct');
+    const fillEl  = document.querySelector('.hero-progress-svg-fill');
+    if (pctEl)  pctEl.textContent = `${Math.round(stats.seasonPct)}%`;
+    if (fillEl) {
+        const dashOffset = RING_CIRCUM * (1 - stats.seasonPct / 100);
+        fillEl.setAttribute('stroke-dashoffset', dashOffset);
+    }
+}
+
+// ── 3D mouse-tilt effect on cards ──────────────────────────
+
+function addCardTiltEffect(card) {
+    if (card.classList.contains('past')) return; // Skip finished-exam cards
+    let rafId = null;
+
+    card.addEventListener('mousemove', (e) => {
+        if (card.classList.contains('maximized')) return;
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+            const rect  = card.getBoundingClientRect();
+            const cx    = e.clientX - rect.left;
+            const cy    = e.clientY - rect.top;
+            const xPct  = cx / rect.width;
+            const yPct  = cy / rect.height;
+            const tiltX = (yPct - 0.5) * 14;   // tilt up/down
+            const tiltY = (xPct - 0.5) * -14;  // tilt left/right
+            card.style.transform = `translateY(-5px) scale(1.01) perspective(900px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+        });
+    });
+
+    card.addEventListener('mouseleave', () => {
+        if (rafId) cancelAnimationFrame(rafId);
+        card.style.transform = '';
+    });
+}
+
+// ── Sparkle burst on number change ─────────────────────────
+
+// SPARKLE_COLORS declared near top of file
+
+function spawnSparkles(el) {
+    const rect   = el.getBoundingClientRect();
+    const cx     = rect.left + rect.width / 2 + window.scrollX;
+    const cy     = rect.top  + rect.height / 2 + window.scrollY;
+    const count  = 6;
+    for (let i = 0; i < count; i++) {
+        const s      = document.createElement('div');
+        s.className  = 'sparkle-particle';
+        const angle  = (i / count) * Math.PI * 2;
+        const dist   = 16 + Math.random() * 14;
+        const dx     = Math.round(Math.cos(angle) * dist);
+        const dy     = Math.round(Math.sin(angle) * dist);
+        s.style.cssText = [
+            `left:${cx}px`, `top:${cy}px`,
+            `background:${SPARKLE_COLORS[i % SPARKLE_COLORS.length]}`,
+            `--sx:${dx}px`,  `--sy:${dy}px`,
+            'margin-left:-2.5px', 'margin-top:-2.5px',
+        ].join(';');
+        document.body.appendChild(s);
+        s.addEventListener('animationend', () => s.remove(), { once: true });
+    }
+}
+
+// ── Enhanced updateTextWithTick (hero sparkles on change) ──
+
+// NOTE: The original updateTextWithTick is replaced inline above (see line ~437).
