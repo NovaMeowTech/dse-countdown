@@ -982,11 +982,11 @@ const SPARKLE_COLORS      = ['#4F46E5', '#7C3AED', '#EC4899', '#6366F1', '#A78BF
 
 // ── Theme customization ─────────────────────────────────────
 const THEMES = [
-    { id: 'indigo', label: '🟣 Indigo', accent: '#4F46E5', accent2: '#7C3AED', accent3: '#EC4899' },
-    { id: 'blue',   label: '🔵 Blue',   accent: '#2563EB', accent2: '#1D4ED8', accent3: '#06B6D4' },
-    { id: 'emerald',label: '🟢 Emerald',accent: '#059669', accent2: '#047857', accent3: '#10B981' },
-    { id: 'rose',   label: '🌸 Rose',   accent: '#E11D48', accent2: '#BE185D', accent3: '#F43F5E' },
-    { id: 'amber',  label: '🌅 Amber',  accent: '#D97706', accent2: '#B45309', accent3: '#F59E0B' },
+    { id: 'indigo',  label: '🟣 Indigo',  accent: '#4F46E5', accent2: '#7C3AED', accent3: '#EC4899' },
+    { id: 'blue',    label: '🔵 Blue',    accent: '#2563EB', accent2: '#1D4ED8', accent3: '#06B6D4' },
+    { id: 'emerald', label: '🟢 Emerald', accent: '#059669', accent2: '#047857', accent3: '#10B981' },
+    { id: 'rose',    label: '🌸 Rose',    accent: '#E11D48', accent2: '#BE185D', accent3: '#F43F5E' },
+    { id: 'amber',   label: '🌅 Amber',   accent: '#D97706', accent2: '#B45309', accent3: '#F59E0B' },
 ];
 function loadThemeId() { return localStorage.getItem('dse_theme') || 'indigo'; }
 function saveThemeId(id) { localStorage.setItem('dse_theme', id); }
@@ -1330,7 +1330,7 @@ function updateFreedomCountdown() {
 function updateFreedomProgressRing() {
     const pctEl  = document.getElementById('freedomRingPct');
     const fillEl = document.querySelector('.freedom-progress-svg-fill');
-    if (!pctEl && !fillEl) return;
+    if (!pctEl || !fillEl) return;
     const pct = getFreedomRingPct();
     if (pctEl)  pctEl.textContent = `${Math.round(pct)}%`;
     if (fillEl) {
