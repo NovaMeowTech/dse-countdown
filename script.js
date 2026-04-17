@@ -448,10 +448,12 @@ function getSubjectDisplayName(subjectKey) {
     if (!subject) return '';
     const lang = getSubjectLang(subjectKey);
     if (lang === 'chi') {
-        const chinesePart = subject.name.replace(subject.englishName, '').trim();
+        const englishPart = subject.englishName || '';
+        if (!englishPart) return subject.name;
+        const chinesePart = subject.name.replace(englishPart, '').trim();
         return chinesePart || subject.name;
     }
-    if (lang === 'eng') return subject.englishName;
+    if (lang === 'eng') return subject.englishName || subject.name;
     return subject.name; // 'default' — show full bilingual name
 }
 
@@ -634,7 +636,7 @@ function renderYearSelector() {
         <div class="settings-section-title">考試年份 Exam Year</div>
         <div class="year-selector">
             <button class="year-btn${activeYear === 2026 ? ' active' : ''}" data-year="2026">2026 DSE</button>
-            <button class="year-btn${activeYear === 2027 ? ' active' : ''}" data-year="2027">2027 DSE ⚠️ Predict</button>
+            <button class="year-btn${activeYear === 2027 ? ' active' : ''}" data-year="2027">2027 DSE ⚠️ Predicted</button>
         </div>
         ${activeYear === 2027 ? '<p class="year-predict-note">⚠️ 2027 年考試日期尚未公佈，以下日期僅根據 2025 年香港中學文憑考試考試日期推算。</p>' : ''}
     `;
