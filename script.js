@@ -583,23 +583,28 @@ function createSubjectButtons() {
         button.addEventListener('click', () => {
             if (isCore) return;
             const index = selectedSubjects.indexOf(subjectKey);
+            const langToggle = entry.querySelector('.lang-toggle');
             if (index > -1) {
                 selectedSubjects.splice(index, 1);
                 button.classList.remove('selected');
+                if (langToggle) langToggle.style.display = 'none';
             } else {
                 selectedSubjects.push(subjectKey);
                 button.classList.add('selected');
+                if (langToggle) langToggle.style.display = '';
             }
             saveSelectedSubjects(selectedSubjects);
         });
         
         entry.appendChild(button);
 
-        // Language toggle for non-chinese, non-english subjects
+        // Language toggle for non-chinese, non-english subjects — only visible when selected
         if (subjectKey !== 'chinese' && subjectKey !== 'english') {
             const currentLang = subjectLanguages[subjectKey] || 'eng';
+            const isSelectedNow = selectedSubjects.includes(subjectKey);
             const toggle = document.createElement('div');
             toggle.className = 'lang-toggle';
+            if (!isSelectedNow) toggle.style.display = 'none';
             toggle.innerHTML = `
                 <button class="lang-btn${currentLang === 'eng' ? ' active' : ''}" data-key="${subjectKey}" data-lang="eng">Eng</button>
                 <button class="lang-btn${currentLang === 'chi' ? ' active' : ''}" data-key="${subjectKey}" data-lang="chi">中</button>
@@ -639,6 +644,10 @@ function renderYearSelector() {
             <button class="year-btn${activeYear === 2027 ? ' active' : ''}" data-year="2027">2027 DSE ⚠️ Predicted</button>
         </div>
         ${activeYear === 2027 ? '<p class="year-predict-note">⚠️ 2027 年考試日期尚未公佈，以下日期僅根據 2025 年香港中學文憑考試考試日期推算。</p>' : ''}
+        <div class="settings-section-title" style="margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--dash);">外觀主題 Color Theme</div>
+        <div class="theme-selector">
+            ${THEMES.map(t => `<button class="theme-btn${loadThemeId() === t.id ? ' active' : ''}" data-theme="${t.id}" style="--theme-color:${t.accent}">${t.label}</button>`).join('')}
+        </div>
     `;
     section.querySelectorAll('.year-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -650,6 +659,15 @@ function renderYearSelector() {
                 createSubjectButtons();
                 renderPredictedWarning();
             }
+        });
+    });
+    section.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.theme;
+            saveThemeId(id);
+            applyTheme(id);
+            section.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
         });
     });
 }
@@ -788,9 +806,22 @@ function createCountdownCard(subjectKey, paper, index) {
     // Stagger entrance animation
     card.style.animationDelay = `${index * CARD_ENTRANCE_STAGGER_MS}ms`;
 
+    let cardScrollY = 0;
     const toggleMaximize = () => {
         const isMaximized = card.classList.toggle('maximized');
-        document.body.style.overflow = isMaximized ? 'hidden' : 'auto';
+        if (isMaximized) {
+            cardScrollY = window.scrollY;
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${cardScrollY}px`;
+            document.body.style.width = '100%';
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+            document.body.style.overflow = '';
+            window.scrollTo(0, cardScrollY);
+        }
         maxBtn.innerHTML = isMaximized ? '✖' : '⛶';
         maxBtn.title = isMaximized ? 'Minimize' : 'Maximize';
     };
@@ -949,6 +980,24 @@ const RING_R              = 26;
 const RING_CIRCUM         = 2 * Math.PI * RING_R; // ≈ 163.4
 const SPARKLE_COLORS      = ['#4F46E5', '#7C3AED', '#EC4899', '#6366F1', '#A78BFA'];
 
+// ── Theme customization ─────────────────────────────────────
+const THEMES = [
+    { id: 'indigo', label: '🟣 Indigo', accent: '#4F46E5', accent2: '#7C3AED', accent3: '#EC4899' },
+    { id: 'blue',   label: '🔵 Blue',   accent: '#2563EB', accent2: '#1D4ED8', accent3: '#06B6D4' },
+    { id: 'emerald',label: '🟢 Emerald',accent: '#059669', accent2: '#047857', accent3: '#10B981' },
+    { id: 'rose',   label: '🌸 Rose',   accent: '#E11D48', accent2: '#BE185D', accent3: '#F43F5E' },
+    { id: 'amber',  label: '🌅 Amber',  accent: '#D97706', accent2: '#B45309', accent3: '#F59E0B' },
+];
+function loadThemeId() { return localStorage.getItem('dse_theme') || 'indigo'; }
+function saveThemeId(id) { localStorage.setItem('dse_theme', id); }
+function applyTheme(themeId) {
+    const theme = THEMES.find(t => t.id === themeId) || THEMES[0];
+    const root = document.documentElement;
+    root.style.setProperty('--accent', theme.accent);
+    root.style.setProperty('--accent-2', theme.accent2);
+    root.style.setProperty('--accent-3', theme.accent3);
+}
+
 function spawnConfetti(card) {
     const container = card.querySelector('.confetti-container');
     if (!container) return;
@@ -1005,6 +1054,7 @@ function updatePageTitle() {
 
 // Initialize the app
 function init() {
+    applyTheme(loadThemeId());
     createSubjectButtons();
     initModal();
     initArticleModal();
@@ -1023,6 +1073,7 @@ function init() {
         updateFreedomCountdown();
         updateExamProgressSection();
         updateHeroProgressRing();
+        updateFreedomProgressRing();
     }, 1000);
     
     // Rotate encouragement message every 10 seconds
@@ -1180,6 +1231,34 @@ function getFreedomDate() {
     return maxDate;
 }
 
+// Returns % of time elapsed from study season start to freedom date
+function getFreedomRingPct() {
+    const freedomDate = getFreedomDate();
+    if (!freedomDate) return 0;
+    return getExamDatePct(freedomDate);
+}
+
+function buildFreedomRingHTML(pct) {
+    const dashOffset = RING_CIRCUM * (1 - pct / 100);
+    return `
+        <div class="freedom-progress-ring-wrap">
+            <svg class="freedom-progress-svg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="freedomGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%"   stop-color="#A78BFA" />
+                        <stop offset="100%" stop-color="#EC4899" />
+                    </linearGradient>
+                </defs>
+                <circle class="freedom-progress-svg-bg"   cx="32" cy="32" r="${RING_R}" />
+                <circle class="freedom-progress-svg-fill" cx="32" cy="32" r="${RING_R}"
+                    stroke-dasharray="${RING_CIRCUM}"
+                    stroke-dashoffset="${dashOffset}" />
+            </svg>
+            <span class="freedom-ring-pct" id="freedomRingPct">${Math.round(pct)}%</span>
+            <span class="freedom-ring-label">完成</span>
+        </div>`;
+}
+
 function createFreedomCountdown() {
     const container = document.getElementById('freedomCountdown');
     const freedomDate = getFreedomDate();
@@ -1191,8 +1270,11 @@ function createFreedomCountdown() {
 
     container.style.display = 'block';
     const timeRemaining = getTimeRemaining(freedomDate);
-    
+    const pct = getFreedomRingPct();
+    const ringHTML = buildFreedomRingHTML(pct);
+
     container.innerHTML = `
+        ${ringHTML}
         <div class="freedom-title">🎉 Countdown to Freedom 🎉</div>
         <div class="freedom-display" data-end="${freedomDate.toISOString()}">
             <div class="freedom-unit">
@@ -1243,6 +1325,18 @@ function updateFreedomCountdown() {
     updateTextWithTick(hoursEl, timeRemaining.hours);
     updateTextWithTick(minutesEl, timeRemaining.minutes);
     updateTextWithTick(secondsEl, timeRemaining.seconds);
+}
+
+function updateFreedomProgressRing() {
+    const pctEl  = document.getElementById('freedomRingPct');
+    const fillEl = document.querySelector('.freedom-progress-svg-fill');
+    if (!pctEl && !fillEl) return;
+    const pct = getFreedomRingPct();
+    if (pctEl)  pctEl.textContent = `${Math.round(pct)}%`;
+    if (fillEl) {
+        const dashOffset = RING_CIRCUM * (1 - pct / 100);
+        fillEl.setAttribute('stroke-dashoffset', dashOffset);
+    }
 }
 
 // DSE 12 Prescribed Texts
